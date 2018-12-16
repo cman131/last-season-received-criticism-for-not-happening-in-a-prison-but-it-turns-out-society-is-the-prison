@@ -1,0 +1,91 @@
+<div
+  class="preview-pane">
+  <img
+    class="preview-pane-image"
+    [attr.src]="selectedCard.imageUrl"
+  />
+  <p
+    class="preview-pane-description">
+    {{ selectedCard.description }}
+  </p>
+  <hr />
+  <div
+    class="preview-pane-menu">
+    <div
+      class="preview-code"
+    >
+      <h2>Game code: {{ gameConfig.code }}</h2>
+    </div>
+    <div
+      class="preview-players sky-form-group"
+    >
+      <div *ngIf="gameConfig.players"
+        class="right-game-info"
+      >
+        <h3>Players connected: {{ gameConfig.players.length }}</h3>
+        <ul
+          class="player-list"
+        >
+          <li *ngFor="let player of gameConfig.players"
+            ngClass="{
+              'active-player': player.id === gameConfig.playerId
+            }"
+          >
+            {{ player.name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div
+      class="preview-browse sky-form-group"
+    >
+      <button
+        class="sky-btn sky-btn-primary sky-form-control"
+        type="button"
+        (click)="enableBrowsing = !enableBrowsing"
+      >
+        {{ enableBrowsing ? 'Hide' : 'Show' }} picked cards
+      </button>
+    </div>
+    <div *ngIf="gameConfig.done"
+      class="preview-export sky-form-group"
+    >
+      <h2>
+        Drafting complete: 
+        <a
+          class="sky-btn sky-btn-primary sky-form-control"
+          routerLink="/draft/export"
+          routerLinkActive="active"
+        >
+          Export cards
+        </a>
+      </h2>
+    </div>
+  </div>
+</div>
+
+<div
+  id="draft-main"
+>
+  <div *ngIf="!enableBrowsing"
+    class="card-pane"
+  >
+    <img *ngFor="let card of currentPack"
+      class="card"
+      [src]="card.imageUrl"
+      [title]="card.name"
+      (click)="submitChoice(card)"
+      (mouseenter)="updateSelected(card)"
+    />
+  </div>
+  <div *ngIf="enableBrowsing"
+    class="card-pane"
+  >
+    <img *ngFor="let card of gameConfig.cards"
+      class="card"
+      [src]="card.imageUrl"
+      [title]="card.name"
+      (mouseenter)="updateSelected(card)"
+    />
+  </div>
+</div>

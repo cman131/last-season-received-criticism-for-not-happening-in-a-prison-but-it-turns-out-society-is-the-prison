@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { AppCreateComponent } from 'src/app/create/app-create.component';
 import { AppJoinComponent } from './join/app-join.component';
 import { AppHomeComponent } from './home/app-home.component';
+import { AppExportComponent } from './export/app-export.component';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { AppDraftComponent } from './draft/app-draft.component';
@@ -19,6 +20,7 @@ const appRoutes: Routes = [
   { path: 'create', component: AppCreateComponent },
   { path: 'join', component: AppJoinComponent},
   { path: 'draft/:code/:player', component: AppDraftComponent },
+  { path: 'draft/export', component: AppExportComponent },
   { path: '**', component: AppHomeComponent }
 ]
 
@@ -28,7 +30,8 @@ const appRoutes: Routes = [
     AppHomeComponent,
     AppCreateComponent,
     AppJoinComponent,
-    AppDraftComponent
+    AppDraftComponent,
+    AppExportComponent
   ],
   imports: [
     CommonModule,
