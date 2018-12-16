@@ -42,9 +42,9 @@
       <button
         class="sky-btn sky-btn-primary sky-form-control"
         type="button"
-        (click)="enableBrowsing = !enableBrowsing"
+        (click)="browseCards = !browseCards"
       >
-        {{ enableBrowsing ? 'Hide' : 'Show' }} picked cards
+        {{ browseCards ? 'Hide' : 'Show' }} picked cards
       </button>
     </div>
     <div *ngIf="gameConfig.done"
@@ -67,7 +67,7 @@
 <div
   id="draft-main"
 >
-  <div *ngIf="!enableBrowsing"
+  <div *ngIf="!browseCards"
     class="card-pane"
   >
     <img *ngFor="let card of currentPack"
@@ -78,7 +78,7 @@
       (mouseenter)="updateSelected(card)"
     />
   </div>
-  <div *ngIf="enableBrowsing"
+  <div *ngIf="browseCards"
     class="card-pane"
   >
     <img *ngFor="let card of gameConfig.cards"

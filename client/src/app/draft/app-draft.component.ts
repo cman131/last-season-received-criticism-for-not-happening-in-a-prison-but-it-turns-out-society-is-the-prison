@@ -14,7 +14,12 @@ import { ScryfallService } from '../shared/scryfall.service';
 export class AppDraftComponent implements OnInit {
   public gameConfig: GameConfig = {};
   public browseCards = false;
-  public selectedCard = {};
+  public selectedCard: Card = {
+    id: '',
+    name: '',
+    description: '',
+    imageUrl: ''
+  };
 
   public currentPack = [];
 
