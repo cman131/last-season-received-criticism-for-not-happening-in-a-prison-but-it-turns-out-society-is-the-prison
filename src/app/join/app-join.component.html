@@ -1,0 +1,49 @@
+<div
+  class="form-section"
+>
+  <div *ngIf="errorMessage"
+    class="form-content"
+  >
+    {{ errorMessage }}
+  </div>
+  <div
+    class="form-content"
+  >
+    <label for="name">
+      Name: 
+      <input
+        id="name"
+        type="text"
+        [ngClass]="{
+          'invalid': !game.name
+        }"
+        [(ngModel)]="game.name"
+      />
+    </label>
+  </div>
+  <div
+    class="form-content"
+  >
+    <label for="code">
+      Code: 
+      <input
+        id="code"
+        type="password"
+        [ngClass]="{
+          'invalid': !game.code
+        }"
+        [(ngModel)]="game.code"
+      />
+    </label>
+  </div>
+  <div
+    class="form-content"
+  >
+    <button
+      (click)="submit()"
+      [disabled]="!game.name || !game.code"
+    >
+      Create game
+    </button>
+  </div>
+</div>

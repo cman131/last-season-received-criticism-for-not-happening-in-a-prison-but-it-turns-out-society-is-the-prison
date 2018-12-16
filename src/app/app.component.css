@@ -1,0 +1,21 @@
+#main-content {
+  margin: 10px;
+}
+.nav-bar {
+  display: flex;
+  background-color: rgb(68, 132, 161);
+  padding: 5px;
+  color: white;
+}
+.nav-bar .home-btn {
+  font-size: 22px;
+  margin-right: 10px;
+}
+.nav-bar a {
+  color: white;
+  margin: 5px;
+  min-height: 26px;
+  line-height: 24px;
+  text-align: center;
+  vertical-align: middle;
+}

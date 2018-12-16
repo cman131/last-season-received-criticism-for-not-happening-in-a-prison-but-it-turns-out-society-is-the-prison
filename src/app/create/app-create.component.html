@@ -1,0 +1,73 @@
+<div
+  class="form-section"
+>
+  <div *ngIf="errorMessage"
+    class="form-content"
+  >
+    {{ errorMessage }}
+  </div>
+  <div
+    class="form-content"
+  >
+    <label for="name">
+      Name: 
+      <input
+        id="name"
+        type="text"
+        [ngClass]="{
+          'invalid': !game.name
+        }"
+        [(ngModel)]="game.name"
+      />
+    </label>
+  </div>
+  <div
+    class="form-content"
+  >
+    <label for="player-count">
+      Max players (1-12): 
+      <input
+        id="player-count"
+        type="number"
+        max="12"
+        min="1"
+        [ngClass]="{
+          'invalid': !isMaxPlayersValid()
+        }"
+        [(ngModel)]="game.numberOfPlayers"
+      />
+    </label>
+  </div>
+  <div
+    class="form-content"
+  >
+    <label for="set-selector">
+      Sets (up to 3): 
+      <select
+        id="set-selector"
+        multiple
+        type="select"
+        [ngClass]="{
+          'invalid': !isSetsValid()
+        }"
+        [(ngModel)]="game.sets"
+      >
+        <option *ngFor="let set of sets"
+          [value]="set.code"
+        >
+          {{ set.name + ' (' + set.code + ')' }}
+        </option>
+      </select>
+    </label>
+  </div>
+  <div
+    class="form-content"
+  >
+    <button
+      (click)="submit()"
+      [disabled]="!isValid()"
+    >
+      Create game
+    </button>
+  </div>
+</div>
