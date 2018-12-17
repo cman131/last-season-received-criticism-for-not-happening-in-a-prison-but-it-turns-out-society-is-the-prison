@@ -63,3 +63,4 @@ typings/
 # my shit
 package-lock.json
 dist/
+config.json
