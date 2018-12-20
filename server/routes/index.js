@@ -14,7 +14,7 @@ let queueFuncComplete = () => {
   handleQueue();
 };
 
-let handleQueue = (requestFunc) => {
+let handleQueue = (requestFunc, res) => {
   if (requestFunc) {
     requestQueue.push(requestFunc);
   }
@@ -22,13 +22,21 @@ let handleQueue = (requestFunc) => {
     lock = true;
     let request = requestQueue[0];
     requestQueue.splice(0, 1);
-    request();
+    try {
+      request();
+    } catch (error) {
+      if (res) {
+        send(res);
+      } else {
+        queueFuncComplete();
+      }
+    }
   }
 };
 
 function send(res, status, data, errorMessage) {
-  queueFuncComplete();
   res.send({ status: status || 500, errorMessage: errorMessage, data: data });
+  queueFuncComplete();
 }
 
 function createGame(game, playerName, ip, res) {
@@ -342,35 +350,40 @@ function removeFirst(arr, checkFunc) {
 router.post('/game', (req, res) => {
   handleQueue(() => {
     createGame(req.body, req.body.playerName, req.ip, res);
-  });
+  }, res);
 });
 
 // Join game
 router.post('/game/:gameId/player', (req, res) => {
   handleQueue(() => {
     joinGame(req.params.gameId, req.body.name, req.ip, res);
-  });
+  }, res);
 });
 
 // Start game
 router.put('/game/:gameId', (req, res) => {
   handleQueue(() => {
     startGame(req.params.gameId, res);
-  });
+  }, res);
 });
 
 // Choose card
 router.post('/game/:gameId/player/:playerId', (req, res) => {
   handleQueue(() => {
     chooseCard(req.params.gameId, req.params.playerId, req.body.card, res);
-  });
+  }, res);
 })
 
 // Get game state/config
 router.get('/game/:gameId/player/:playerId', (req, res) => {
   handleQueue(() => {
     getGameConfig(req.params.gameId, req.params.playerId, res);
-  });
+  }, res);
+});
+
+// Home to test that we're running
+router.get('/', (req, res) => {
+  res.send({status: 200, message: 'banana'});
 });
 
 module.exports = router;
