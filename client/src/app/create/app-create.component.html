@@ -2,7 +2,7 @@
   class="form-section"
 >
   <div *ngIf="errorMessage"
-    class="form-content"
+    class="form-content error-message"
   >
     {{ errorMessage }}
   </div>
@@ -34,7 +34,7 @@
         [ngClass]="{
           'invalid': !isMaxPlayersValid()
         }"
-        [(ngModel)]="game.numberOfPlayers"
+        [(ngModel)]="game.maxPlayers"
       />
     </label>
   </div>

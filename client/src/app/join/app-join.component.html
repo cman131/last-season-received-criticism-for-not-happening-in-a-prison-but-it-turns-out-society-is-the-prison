@@ -2,7 +2,7 @@
   class="form-section"
 >
   <div *ngIf="errorMessage"
-    class="form-content"
+    class="form-content error-message"
   >
     {{ errorMessage }}
   </div>
@@ -43,7 +43,7 @@
       (click)="submit()"
       [disabled]="!game.name || !game.code"
     >
-      Create game
+      Join game
     </button>
   </div>
 </div>

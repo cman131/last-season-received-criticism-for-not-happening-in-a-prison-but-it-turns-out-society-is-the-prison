@@ -14,29 +14,39 @@
     <div
       class="preview-code"
     >
-      <h2>Game code: {{ gameConfig.code }}</h2>
+      <h3>Game code</h3>
+      <p>{{ gameConfig.code }}</p>
     </div>
     <div
       class="preview-players sky-form-group"
     >
-      <div *ngIf="gameConfig.players"
+      <div *ngIf="gameConfig.players && gameConfig.players.length > 0 && gameConfig.state !== 1"
         class="right-game-info"
       >
         <h3>Players connected: {{ gameConfig.players.length }}</h3>
         <ul
           class="player-list"
         >
-          <li *ngFor="let player of gameConfig.players"
-            ngClass="{
-              'active-player': player.id === gameConfig.playerId
-            }"
-          >
-            {{ player.name }}
+          <li *ngFor="let player of gameConfig.players">
+            {{ player }}
           </li>
         </ul>
       </div>
     </div>
-    <div
+    <div *ngIf="gameConfig.state !== 1"
+      class="preview-browse sky-form-group"
+    >
+      <button
+        class="sky-btn sky-btn-primary sky-form-control"
+        type="button"
+        [title]="gameConfig.players && gameConfig.players.length <= 1 ? 'Must have at least 2 players.' : undefined"
+        [disabled]="gameConfig.players && gameConfig.players.length <= 1"
+        (click)="startGame()"
+      >
+        Start game
+      </button>
+    </div>
+    <div *ngIf="gameConfig.state === 1"
       class="preview-browse sky-form-group"
     >
       <button
@@ -50,7 +60,7 @@
     <div *ngIf="gameConfig.done"
       class="preview-export sky-form-group"
     >
-      <h2>
+      <h3>
         Drafting complete: 
         <a
           class="sky-btn sky-btn-primary sky-form-control"
@@ -59,7 +69,7 @@
         >
           Export cards
         </a>
-      </h2>
+      </h3>
     </div>
   </div>
 </div>
@@ -67,7 +77,7 @@
 <div
   id="draft-main"
 >
-  <div *ngIf="!browseCards"
+  <div *ngIf="!browseCards && currentPack.length > 0 && gameConfig.state === 1"
     class="card-pane"
   >
     <img *ngFor="let card of currentPack"
@@ -77,6 +87,22 @@
       (click)="submitChoice(card)"
       (mouseenter)="updateSelected(card)"
     />
+  </div>
+  <div *ngIf="!browseCards && (currentPack.length === 0 || gameConfig.state !== 1)"
+    class="ripple-pane"
+  >
+      <h2 *ngIf="gameConfig.state !== 1">Waiting for game start...</h2>
+      <h2 *ngIf="gameConfig.state === 1 && !gameConfig.done">Awaiting next pack...</h2>
+      <h2 *ngIf="gameConfig.state === 1 && gameConfig.done">Draft Complete</h2>
+      <p *ngIf="gameConfig.state === 1 && gameConfig.done">(Export cards on the left)</p>
+    <div *ngIf="!gameConfig.done">
+      <div
+        class="lds-ripple"
+      >
+        <div></div>
+        <div></div>
+      </div>
+    </div>
   </div>
   <div *ngIf="browseCards"
     class="card-pane"

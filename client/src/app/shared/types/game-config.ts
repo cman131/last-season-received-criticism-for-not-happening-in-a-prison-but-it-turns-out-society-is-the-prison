@@ -1,15 +1,14 @@
-import { Player } from './player';
 import { Card } from './card';
 
 export interface GameConfig {
   name?: string;
-  numberOfPlayers?: number;
+  maxPlayers?: number;
   sets?: string[];
   code?: string;
   playerId?: string;
-  players?: Player[];
+  players?: string[];
   cards?: Card[];
   currentPack?: string[];
-  status?: number;
+  state?: number;
   done?: boolean;
 }

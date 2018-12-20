@@ -15,8 +15,8 @@ import { take } from 'rxjs/operators';
 export class AppCreateComponent {
   public game: GameConfig = {
     name: '',
-    numberOfPlayers: 8,
-    sets: ['uma']
+    maxPlayers: 8,
+    sets: ['grn']
   };
   public sets: Set[] = [];
   public errorMessage: string;
@@ -32,9 +32,9 @@ export class AppCreateComponent {
   }
 
   public isMaxPlayersValid() {
-    return this.game.numberOfPlayers
-      && this.game.numberOfPlayers > 0
-      && this.game.numberOfPlayers < 13;
+    return this.game.maxPlayers
+      && this.game.maxPlayers > 0
+      && this.game.maxPlayers < 13;
   }
 
   public isSetsValid() {

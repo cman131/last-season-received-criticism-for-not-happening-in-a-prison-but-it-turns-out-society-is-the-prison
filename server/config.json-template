@@ -1,0 +1,3 @@
+{
+  "dbUrl": "mongodb://USER:PASSWORD@MONGODB_LOCATION:PORT/draft"
+}

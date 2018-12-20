@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { GameConfig } from '../shared/types/game-config';
 import { GameService } from '../shared/game.service';
@@ -11,8 +11,12 @@ import { ScryfallService } from '../shared/scryfall.service';
   templateUrl: './app-draft.component.html',
   styleUrls: ['./app-draft.component.css']
 })
-export class AppDraftComponent implements OnInit {
-  public gameConfig: GameConfig = {};
+export class AppDraftComponent implements OnInit, OnDestroy {
+  public gameConfig: GameConfig = {
+    code: '',
+    players: [],
+    currentPack: []
+  };
   public browseCards = false;
   public selectedCard: Card = {
     id: '',
@@ -25,7 +29,6 @@ export class AppDraftComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private gameService: GameService,
     private scryfall: ScryfallService
   ) { }
@@ -34,15 +37,30 @@ export class AppDraftComponent implements OnInit {
     this.route.paramMap.pipe(take(1)).subscribe((params: ParamMap) => {
       this.gameConfig.code = params.get('code');
       this.gameConfig.playerId = params.get('player');
-      this.gameService.setConfig(this.gameConfig);
+      this.gameService.setConfigListener(this.gameConfig.code, this.gameConfig.playerId);
     });
     this.gameService.gameConfig.subscribe(config => {
-        if (this.gameConfig.currentPack !== config.currentPack && config.currentPack.length > 0) {
-          this.scryfall.getCards(config.currentPack).pipe(take(1)).subscribe(cards => this.currentPack = cards);
-        }
+      if (config
+        && config.currentPack
+        && this.gameConfig.currentPack !== config.currentPack
+        && config.currentPack.length > 0
+      ) {
+        this.scryfall.getCards(config.currentPack).pipe(take(1)).subscribe(cards => this.currentPack = cards);
+      } else if ( config && config.currentPack && config.currentPack.length === 0) {
+        this.currentPack = [];
+      }
+      if (config) {
         this.gameConfig = config;
       }
-    );
+    });
+  }
+
+  public ngOnDestroy() {
+    this.gameService.stopListener();
+  }
+
+  public startGame() {
+    this.gameService.startGame();
   }
 
   public submitChoice(card: Card) {

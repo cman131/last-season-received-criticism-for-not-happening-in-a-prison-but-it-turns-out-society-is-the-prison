@@ -14,6 +14,7 @@ import { AppDraftComponent } from './draft/app-draft.component';
 import { ManagementService } from './shared/management.service';
 import { GameService } from './shared/game.service';
 import { ScryfallService } from './shared/scryfall.service';
+import { ConfigService } from './shared/config.service';
 
 const appRoutes: Routes = [
   { path: '', component: AppHomeComponent },
@@ -45,7 +46,8 @@ const appRoutes: Routes = [
   providers: [
     ManagementService,
     GameService,
-    ScryfallService
+    ScryfallService,
+    ConfigService
   ],
   bootstrap: [AppComponent]
 })

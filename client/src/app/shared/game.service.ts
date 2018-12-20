@@ -1,48 +1,85 @@
-import { Injectable } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { GameConfig } from './types/game-config';
 import { Card } from './types/card';
+import { take } from 'rxjs/operators';
+import { ConfigService } from './config.service';
 
 @Injectable()
-export class GameService {
-  private _gameConfig: GameConfig = {};
+export class GameService implements OnDestroy {
+  private _gameConfig: GameConfig = {
+    state: 0,
+    players: [],
+    currentPack: [],
+    cards: []
+  };
   public gameConfig: BehaviorSubject<GameConfig> = new BehaviorSubject(this._gameConfig);
 
-  constructor(
-    private http: HttpClient
-  ) { }
+  private baseUrl: string;
+  private configListener: any;
 
-  public refreshConfig() {
-    // Refresh the game config
-    this.gameConfig.next(this._gameConfig);
+  constructor(
+    private config: ConfigService,
+    private http: HttpClient
+  ) {
+    this.baseUrl = this.config.configuration.baseUrl;
   }
 
-  public setConfig(config: GameConfig) {
-    // set the code
-    this._gameConfig.code = config.code;
-    this._gameConfig.playerId = config.playerId;
-    this._gameConfig.players = [{
-      id: config.playerId,
-      name: 'Conor'
-    }];
-    this._gameConfig.currentPack = [
-      'Ancient tomb',
-      'Vivid Revival',
-      'Jace\'s Archivist'
-    ];
-    this.gameConfig.next(this._gameConfig);
+  public ngOnDestroy() {
+    this.stopListener();
+    this.gameConfig.complete();
+  }
+
+  public setConfigListener(code: string, playerId: string) {
+    this._gameConfig.code = code;
+    this._gameConfig.playerId = playerId;
+    if (!this.configListener) {
+      this.refreshConfig(this.http);
+      this.configListener = setInterval(() => this.refreshConfig(this.http), 5000);
+    }
+  }
+
+  public stopListener() {
+    if (this.configListener) {
+      clearInterval(this.configListener);
+      this.configListener = undefined;
+    }
   }
 
   public submitCardChoice(card: Card) {
-    // Send card pick
+    this.stopListener();
     if (!this._gameConfig.cards) {
       this._gameConfig.cards = [];
     }
+
     this._gameConfig.cards.push(card);
-    if (this._gameConfig.cards.length >= 15) {
-      this._gameConfig.done = true;
+    this._gameConfig.currentPack = [];
+    this.gameConfig.next(this._gameConfig);
+
+    this.http.post(this.baseUrl + '/game/' + this._gameConfig.code + '/player/' + this._gameConfig.playerId, {
+      card: card
+    }).pipe(take(1)).subscribe((response) => {
+      this.setConfigListener(this._gameConfig.code, this._gameConfig.playerId);
+    });
+
+  }
+
+  public startGame() {
+    if (this._gameConfig.state === 0) {
+      this.stopListener();
+      this.http.put(this.baseUrl + '/game/' + this._gameConfig.code, {}).pipe(take(1)).subscribe((response) => {
+        this.setConfigListener(this._gameConfig.code, this._gameConfig.playerId);
+      });
     }
-    this.refreshConfig();
+  }
+
+  private refreshConfig(http: HttpClient) {
+    // Refresh the game config
+    http.get(this.baseUrl + '/game/' + this._gameConfig.code + '/player/' + this._gameConfig.playerId).pipe(take(1)).subscribe((response: any) => {
+      this._gameConfig = response.data;
+      this.gameConfig.next(this._gameConfig);
+      console.log(this._gameConfig.state);
+    });
   }
 }
