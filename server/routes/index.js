@@ -315,10 +315,16 @@ function pickACard(playerId, card, game) {
   player.cards.push(card);
   player.currentPack = removeFirst(player.currentPack, (item) => item === card.name);
 
-  let nextPlayerIndex = game.players.indexOf(player) + 1;
-  nextPlayerIndex = nextPlayerIndex > game.players.length - 1 ? 0 : nextPlayerIndex;
-  let nextPlayer = game.players[nextPlayerIndex];
+  let nextPlayerIndex;
+  if (player.backupPacks.length = 1) {
+    nextPlayerIndex = game.players.indexOf(player) - 1;
+    nextPlayerIndex = nextPlayerIndex < 0 ? game.players.length - 1 : nextPlayerIndex;
+  } else {
+    nextPlayerIndex = game.players.indexOf(player) + 1;
+    nextPlayerIndex = nextPlayerIndex > game.players.length - 1 ? 0 : nextPlayerIndex;
+  }
 
+  let nextPlayer = game.players[nextPlayerIndex];
   if (player.currentPack.length === 0) {
     if (player.backupPacks.length === 0) {
       player.done = true;
