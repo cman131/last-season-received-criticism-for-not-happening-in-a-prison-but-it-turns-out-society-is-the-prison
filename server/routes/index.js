@@ -316,7 +316,7 @@ function pickACard(playerId, card, game) {
   player.currentPack = removeFirst(player.currentPack, (item) => item === card.name);
 
   let nextPlayerIndex;
-  if (player.backupPacks.length = 1) {
+  if (player.backupPacks.length === 1) {
     nextPlayerIndex = game.players.indexOf(player) - 1;
     nextPlayerIndex = nextPlayerIndex < 0 ? game.players.length - 1 : nextPlayerIndex;
   } else {
