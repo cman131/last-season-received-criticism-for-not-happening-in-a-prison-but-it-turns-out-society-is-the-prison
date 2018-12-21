@@ -306,6 +306,12 @@ function populatePacks(code, playerId, sets) {
 
 function pickACard(playerId, card, game) {
   let player = game.players.filter(plyr => plyr.id.toString() === playerId.toString())[0];
+
+  // fucked up with an additional request
+  if (player.currentPack.filter(item => item === card.name).length === 0) {
+    return game;
+  }
+
   player.cards.push(card);
   player.currentPack = removeFirst(player.currentPack, (item) => item === card.name);
 
