@@ -2,7 +2,7 @@
   class="preview-pane">
   <img
     class="preview-pane-image"
-    [attr.src]="selectedCard.imageUrl"
+    [attr.src]="selectedCard.imageUrl || backupImg"
   />
   <p
     class="preview-pane-description">

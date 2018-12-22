@@ -12,6 +12,7 @@ import { ScryfallService } from '../shared/scryfall.service';
   styleUrls: ['./app-draft.component.css']
 })
 export class AppDraftComponent implements OnInit, OnDestroy {
+  public backupImg = "https://d1u5p3l4wpay3k.cloudfront.net/mtgsalvation_gamepedia/thumb/f/f8/Magic_card_back.jpg/200px-Magic_card_back.jpg?version=4f6a80129fc99f07b7723141b122def4";
   public gameConfig: GameConfig = {
     code: '',
     players: [],
