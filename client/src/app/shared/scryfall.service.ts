@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, take } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -13,7 +13,7 @@ export class ScryfallService {
     'masters',
     'draft_innovation',
     'funny'
-  ]
+  ];
 
   constructor(
     private http: HttpClient
@@ -29,10 +29,14 @@ export class ScryfallService {
       identifiers: cards
     }).pipe(map((data: any) => {
       return data.data.map(card => {
+        let description = card.oracle_text;
+        if (card.card_faces) {
+          description = card.card_faces.map(cardFace => cardFace.name + ' - ' + cardFace.oracle_text).join('<br/>');
+        }
         return {
           id: card.id,
           name: card.name,
-          description: card.oracle_text,
+          description: description,
           imageUrl: card.image_uris.large
         };
       });

@@ -5,6 +5,7 @@ export interface GameConfig {
   maxPlayers?: number;
   sets?: string[];
   code?: string;
+  isPassingLeft?: boolean;
   playerId?: string;
   players?: string[];
   cards?: Card[];

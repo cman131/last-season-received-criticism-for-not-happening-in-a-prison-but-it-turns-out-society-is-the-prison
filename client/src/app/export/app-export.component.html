@@ -1,12 +1,29 @@
-<h2>Text format:</h2>
-<textarea
-  id="text-output"
-  [ngModel]="cardListText"
+
+<div
+  class="text-export"
 >
-</textarea>
-<button
-  class="copy-btn"
-  (click)="copyText()"
+  <h2>Text format:</h2>
+  <textarea
+    class="text-output"
+    [ngModel]="cardListText"
+  >
+  </textarea>
+  <button
+    class="btn copy-btn"
+    (click)="copyText()"
+  >
+    Copy to clipboard
+  </button>
+</div>
+
+<div
+  class="tabletop-export"
 >
-  Copy to clipboard
-</button>
+  <a *ngIf="tabletopData"
+    class="btn btn-primary"
+    download="draft_pool.json"
+    [href]="tabletopData"
+  >
+    Download
+  </a>
+</div>

@@ -4,10 +4,20 @@
     class="preview-pane-image"
     [attr.src]="selectedCard.imageUrl || backupImg"
   />
-  <p
-    class="preview-pane-description">
-    {{ selectedCard.description }}
-  </p>
+  <div
+    class="preview-pane-description"
+  >
+    <p *ngIf="!selectedCard.description"
+      class="preview-pane-description-none"
+    >
+      -- No Effect --
+    </p>
+    <p *ngFor="let description of getDescriptions(selectedCard.description); last as isLast">
+      {{ description }}
+      <br *ngIf="!isLast" />
+      <br *ngIf="!isLast" />
+    </p>
+  </div>
   <hr />
   <div
     class="preview-pane-menu">
@@ -20,20 +30,36 @@
     <div
       class="preview-players sky-form-group"
     >
-      <div *ngIf="gameConfig.players && gameConfig.players.length > 0 && gameConfig.state !== 1"
+      <div
         class="right-game-info"
       >
-        <h3>Players connected: {{ gameConfig.players.length }}</h3>
-        <ul
-          class="player-list"
+        <h3>
+          Players connected: {{ gameConfig.players.length }} 
+          <i
+            class="fas chevron"
+            [ngClass]="{
+              'fa-chevron-down': !showPlayers,
+              'fa-chevron-up': showPlayers
+            }"
+            [title]="showPlayers ? 'hide player list' : 'show player list'"
+            (click)="showPlayers = !showPlayers"
+          >
+          </i>
+        </h3>
+        <ul *ngIf="showPlayers"
+          class="player-list no-select"
         >
-          <li *ngFor="let player of gameConfig.players">
+          <li *ngFor="let player of gameConfig.players"
+            [ngClass]="{
+              'active-player': player === gameConfig.name
+            }"
+          >
             {{ player }}
           </li>
         </ul>
       </div>
     </div>
-    <div *ngIf="gameConfig.state !== 1"
+    <div *ngIf="gameConfig.state === 0"
       class="preview-browse sky-form-group"
     >
       <button
@@ -64,7 +90,7 @@
         Drafting complete: 
         <a
           class="sky-btn sky-btn-primary sky-form-control"
-          routerLink="/draft/export"
+          [routerLink]="['export']"
           routerLinkActive="active"
         >
           Export cards
@@ -77,9 +103,40 @@
 <div
   id="draft-main"
 >
+  <div *ngIf="!browseCards && gameConfig.state === 1 && gameConfig.players.length > 0"
+    class="draft-nav-pane"
+  >
+    <p
+      class="draft-left-player"
+    >
+      {{ leftPlayer }}
+    </p>
+    <p
+      class="draft-direction"
+    >
+      <i
+        class="fas"
+        [ngClass]="{
+          'fa-arrow-left': gameConfig.isPassingLeft,
+          'fa-arrow-right': !gameConfig.isPassingLeft
+        }"
+      >
+      </i>
+    </p>
+    <p
+      class="draft-right-player"
+    >
+      {{ rightPlayer }}
+    </p>
+  </div>
   <div *ngIf="!browseCards && currentPack.length > 0 && gameConfig.state === 1"
     class="card-pane"
   >
+    <p
+      class="card-count no-select"
+    >
+      Cards: {{ currentPack.length }}
+    </p>
     <img *ngFor="let card of currentPack"
       class="card"
       [src]="card.imageUrl"
@@ -91,10 +148,10 @@
   <div *ngIf="!browseCards && (currentPack.length === 0 || gameConfig.state !== 1)"
     class="ripple-pane"
   >
-      <h2 *ngIf="gameConfig.state !== 1">Waiting for game start...</h2>
-      <h2 *ngIf="gameConfig.state === 1 && !gameConfig.done">Awaiting next pack...</h2>
-      <h2 *ngIf="gameConfig.state === 1 && gameConfig.done">Draft Complete</h2>
-      <p *ngIf="gameConfig.state === 1 && gameConfig.done">(Export cards on the left)</p>
+    <h2 *ngIf="gameConfig.state !== 1">Waiting for game start...</h2>
+    <h2 *ngIf="gameConfig.state === 1 && !gameConfig.done">Awaiting next pack from {{ nextPlayer }}...</h2>
+    <h2 *ngIf="gameConfig.state === 1 && gameConfig.done">Draft Complete</h2>
+    <p *ngIf="gameConfig.state === 1 && gameConfig.done">(Export cards on the left)</p>
     <div *ngIf="!gameConfig.done">
       <div
         class="lds-ripple"
@@ -105,8 +162,30 @@
     </div>
   </div>
   <div *ngIf="browseCards"
-    class="card-pane"
+    class="draft-nav-pane"
   >
+    <p
+      class="draft-left-player"
+    >
+    </p>
+    <h2
+      class="draft-direction"
+    >
+      Picked cards
+    </h2>
+    <p
+      class="draft-right-player"
+    >
+    </p>
+  </div>
+  <div *ngIf="browseCards"
+    class="card-pane picked-cards"
+  >
+    <p
+      class="card-count no-select"
+    >
+      Cards: {{ gameConfig.cards.length }}
+    </p>
     <img *ngFor="let card of gameConfig.cards"
       class="card"
       [src]="card.imageUrl"

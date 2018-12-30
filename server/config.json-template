@@ -1,3 +1,4 @@
 {
-  "dbUrl": "mongodb://USER:PASSWORD@MONGODB_LOCATION:PORT/draft"
+  "dbUrl": "mongodb://USER:PASSWORD@MONGODB_LOCATION:PORT/draft",
+  "imgurClientId": "IMGUR_CLIENT_ID"
 }

@@ -4,6 +4,10 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectID;
 const config = require('../config');
 const request = require('request');
+
+const Jimp = require('jimp');
+const TabletopGenerator = require('./tabletop-generator');
+
 let baseBoosterUrl = 'https://api.magicthegathering.io/v1/sets/{0}/booster';
 
 const requestQueue = [];
@@ -226,6 +230,7 @@ function getGameConfig(code, playerId, res) {
               maxPlayers: result.maxPlayers,
               sets: result.sets,
               code: code,
+              isPassingLeft: playerMatch[0].backupPacks.length !== 1,
               playerId: playerId,
               players: result.players.map(player => player.name),
               cards: playerMatch[0].cards,
@@ -358,6 +363,38 @@ function removeFirst(arr, checkFunc) {
   return arr;
 }
 
+async function getPlayer(code, playerId, callback, errCallback) {
+  MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
+    if (err) {
+      throw err;
+    } else {
+      const db = database.db('draft');
+      db.collection('games').find({ code: new ObjectId(code) }).toArray((err, results) => {
+        if (err || results.length === 0) {
+          errCallback({
+            status: 400,
+            errorMessage: 'Game not found.'
+          });
+          database.close();
+          return;
+        }
+
+        let result = results[0];
+        let playerMatch = result.players.filter(player => player.id.toString() === playerId.toString());
+        database.close();
+        if (playerMatch.length > 0) {
+          callback(playerMatch[0]);
+        } else {
+          errCallback({
+            status: 400,
+            errorMessage: 'Player not found'
+          });
+        }
+      });
+    }
+  });
+}
+
 // Create game
 router.post('/game', (req, res) => {
   handleQueue(() => {
@@ -384,7 +421,19 @@ router.post('/game/:gameId/player/:playerId', (req, res) => {
   handleQueue(() => {
     chooseCard(req.params.gameId, req.params.playerId, req.body.card, res);
   }, res);
-})
+});
+
+router.get('/game/:gameId/player/:playerId/cards/tabletop', (req, res) => {
+  let code = req.params.gameId;
+  let playerId = req.params.playerId;
+  getPlayer(code, playerId, async(player) => {
+    await TabletopGenerator.generateTabletopJson('Draft pool', 'Cards from a recent draft', player.cards, req.query.addLand, (ttObject) => {
+      res.json(ttObject);
+    });
+  }, (errResponse) => {
+    res.send(errResponse);
+  });
+});
 
 // Get game state/config
 router.get('/game/:gameId/player/:playerId', (req, res) => {

@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from "@angular/core";
+import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { GameConfig } from './types/game-config';
@@ -75,7 +75,9 @@ export class GameService implements OnDestroy {
 
   private refreshConfig(http: HttpClient) {
     // Refresh the game config
-    http.get(this.baseUrl + '/game/' + this._gameConfig.code + '/player/' + this._gameConfig.playerId).pipe(take(1)).subscribe((response: any) => {
+    http.get(
+      this.baseUrl + '/game/' + this._gameConfig.code + '/player/' + this._gameConfig.playerId
+    ).pipe(take(1)).subscribe((response: any) => {
       if (this.configListener) {
         this._gameConfig = response.data;
         this.gameConfig.next(this._gameConfig);

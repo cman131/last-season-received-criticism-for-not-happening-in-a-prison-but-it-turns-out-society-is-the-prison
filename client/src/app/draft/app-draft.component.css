@@ -8,6 +8,14 @@ ul {
   list-style: none;
 }
 
+.no-select {
+  user-select: none;
+  -moz-user-select: none;
+  -ms-touch-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+}
+
 .preview-pane {
   display: inline-block;
   width: 300px;
@@ -24,18 +32,48 @@ ul {
 .preview-pane-description {
   width: 280px;
   height: 120px;
+  padding: 5px;
   background-color: white;
   border: 1px solid black;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.preview-pane-description p {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.preview-pane-description-none {
+  font-style: italic;
+}
+
+.chevron {
+  padding-left: 2px;
+  cursor: pointer;
 }
 
 .player-list {
-  margin-top: none;
-  width: 140px;
-  height: 40px;
+  margin-top: 0;
+  width: 185px;
+  height: 70px;
   background-color: white;
   border: 1px solid black;
   overflow-y: auto;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.player-list li {
+  padding-left: 10px;
+  padding-right: 20px;
+}
+
+.active-player {
+  background-color: rgba(128, 128, 128, 0.726);
 }
 
 #draft-main {
@@ -45,6 +83,31 @@ ul {
   border-left: 4px solid gray;
 }
 
+.draft-nav-pane {
+  display: flex;
+  padding-left: 5px;
+  padding-right: 5px;
+  max-height: 50px;
+}
+
+.draft-left-player {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.draft-direction {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.draft-right-player {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .card-pane {
   border: 1px solid gray;
   border-radius: 5px;
@@ -52,11 +115,12 @@ ul {
   flex-wrap: wrap;
   align-content: flex-start;
   margin-bottom: 10px;
-  height: 729px;
+  height: 700px;
   padding: 15px;
   padding-top: 5px;
   padding-bottom: 5px;
   overflow-y: auto;
+  position: relative;
 }
 
 .card {
@@ -65,6 +129,19 @@ ul {
   flex: 0 0 100.8px;
   margin: 5px;
   cursor: pointer;
+}
+
+.card-count {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  padding: 10px;
+  border: 1px solid black;
+  background-color: white;
+}
+
+.picked-cards {
+  background-color: rgb(28, 95, 28);
 }
 
 .ripple-pane {
@@ -76,7 +153,7 @@ ul {
   align-items: center;
   justify-content: center;
   margin-bottom: 10px;
-  height: 729px;
+  height: 700px;
   padding: 15px;
   padding-top: 5px;
   padding-bottom: 5px;
