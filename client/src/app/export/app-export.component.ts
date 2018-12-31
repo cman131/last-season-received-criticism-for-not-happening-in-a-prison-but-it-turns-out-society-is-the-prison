@@ -26,7 +26,7 @@ export class AppExportComponent implements OnDestroy {
     return text;
   }
 
-  private tabletopData: string;
+  public tabletopData: string;
 
   constructor(
     private route: ActivatedRoute,
