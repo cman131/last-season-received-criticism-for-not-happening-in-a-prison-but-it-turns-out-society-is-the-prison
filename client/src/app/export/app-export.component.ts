@@ -2,8 +2,8 @@ import { Component, OnDestroy } from '@angular/core';
 import { GameService } from '../shared/game.service';
 import { ExportService } from '../shared/export.service';
 import { Card } from '../shared/types/card';
-import { Router, ParamMap, ActivatedRoute } from '@angular/router';
-import { take, takeUntil } from 'rxjs/operators';
+import { ParamMap, ActivatedRoute } from '@angular/router';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-export',

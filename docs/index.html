@@ -12,8 +12,18 @@
         margin: 0;
       }
     </style>
+    <script>
+      // Redirect fix for refreshes into 404s
+      (function(){
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
   <link rel="stylesheet" href="styles.280e991c5992f8630bc9.css"></head>
   <body>
     <app-root></app-root>
-  <script type="text/javascript" src="runtime.ec2944dd8b20ec099bf3.js"></script><script type="text/javascript" src="polyfills.fec146f4472ee5fb9cac.js"></script><script type="text/javascript" src="main.3d44d48d961f4ef300b8.js"></script></body>
+  <script type="text/javascript" src="runtime.ec2944dd8b20ec099bf3.js"></script><script type="text/javascript" src="polyfills.fec146f4472ee5fb9cac.js"></script><script type="text/javascript" src="main.c029ee5ff3f8743fbac1.js"></script></body>
 </html>
