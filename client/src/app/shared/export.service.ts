@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { ConfigService } from './config.service';
+import { Observable } from 'rxjs';
+import { take, map } from 'rxjs/operators';
+import { TabletopResponse } from './types/tabletop-response';
 
 @Injectable()
 export class ExportService {
@@ -14,7 +17,9 @@ export class ExportService {
     this.baseUrl = this.config.configuration.baseUrl;
   }
 
-  public getTabletopConvertUrl(code: string, playerId: string, addLand = true): string {
-    return this.baseUrl + '/game/' + code + '/player/' + playerId + '/cards/tabletop?addLand=' + (addLand ? 'true' : 'false');
+  public getTabletopJson(code: string, playerId: string, addLand = true): Observable<TabletopResponse> {
+    return this.http.get(
+      this.baseUrl + '/game/' + code + '/player/' + playerId + '/cards/tabletop?addLand=' + (addLand ? 'true' : 'false')
+    ).pipe(take(1)).pipe(map(value => value as TabletopResponse));
   }
 }

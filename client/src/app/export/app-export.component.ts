@@ -4,6 +4,7 @@ import { ExportService } from '../shared/export.service';
 import { Card } from '../shared/types/card';
 import { ParamMap, ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
+import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 
 @Component({
   selector: 'app-export',
@@ -14,6 +15,7 @@ export class AppExportComponent implements OnDestroy {
   public cards: Card[] = [];
   public code: string;
   public playerId: string;
+  public copiedState = false;
 
   public get cardListText(): string {
     let text = '';
@@ -26,7 +28,7 @@ export class AppExportComponent implements OnDestroy {
     return text;
   }
 
-  public tabletopData: string;
+  public tabletopDataListener: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -52,18 +54,61 @@ export class AppExportComponent implements OnDestroy {
         this.cards = Object.values(cardDict);
       }
     });
-
-    // change the route for export to include game and player ids
-    this.tabletopData = this.exportService.getTabletopConvertUrl(this.code, this.playerId);
   }
 
   public ngOnDestroy() {
     this.gameService.stopListener();
+    this.stopListener();
   }
 
   public copyText() {
-    const field: any = document.getElementById('text-output');
-    field.select();
+    const el = document.createElement('textarea');
+    el.value = this.cardListText;
+    document.body.appendChild(el);
+    el.select();
     document.execCommand('copy');
+    document.body.removeChild(el);
+    this.notifyCopied();
+  }
+
+  public getTabletopData(): void {
+    if (!this.tabletopDataListener) {
+      this.checkForTabletopData();
+      this.tabletopDataListener = setInterval(() => this.checkForTabletopData(), 5000);
+    }
+  }
+
+  public stopListener(): void {
+    if (this.tabletopDataListener) {
+      clearInterval(this.tabletopDataListener);
+      this.tabletopDataListener = undefined;
+    }
+  }
+
+  public checkForTabletopData(): void {
+    this.exportService.getTabletopJson(this.code, this.playerId).subscribe((value) => {
+      if (!value.isProcessing && value.data) {
+        this.stopListener();
+        const blob = new Blob([JSON.stringify(value.data)], { type: 'text/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = window.document.createElement('a');
+        a.href = url;
+        a.download = 'draft-pool.json';
+
+        // Append anchor to body.
+        document.body.appendChild(a);
+        a.click();
+
+        // Remove anchor from body
+        document.body.removeChild(a);
+      }
+    });
+  }
+
+  private notifyCopied() {
+    this.copiedState = true;
+    setTimeout(() => {
+      this.copiedState = false;
+    }, 2000);
   }
 }

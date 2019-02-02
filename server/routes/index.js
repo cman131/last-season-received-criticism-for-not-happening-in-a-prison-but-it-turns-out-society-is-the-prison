@@ -74,7 +74,11 @@ function createGame(game, playerName, ip, res) {
           backupPacks: [],
           packQueue: [],
           cards: [],
-          done: false
+          done: false,
+          tabletopImages: {
+            state: 0,
+            links: []
+          }
         }]
       }, (err) => {
         if (err) {
@@ -129,7 +133,11 @@ function joinGame(code, playerName, ip, res) {
                   backupPacks: [],
                   packQueue: [],
                   cards: [],
-                  done: false
+                  done: false,
+                  tabletopImages: {
+                    state: 0,
+                    links: []
+                  }
                 }
               }
             }, (err) => {
@@ -253,7 +261,6 @@ function populatePacks(code, playerId, sets) {
   let boosters = [];
   let boosterFulfillment = (data) => {
     if (!data.cards) {
-      console.log(data);
       return;
     }
     boosters.push(data.cards.map(item => {
@@ -363,7 +370,7 @@ function removeFirst(arr, checkFunc) {
   return arr;
 }
 
-async function getPlayer(code, playerId, callback, errCallback) {
+function getPlayer(code, playerId, callback, errCallback) {
   MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
     if (err) {
       throw err;
@@ -390,6 +397,34 @@ async function getPlayer(code, playerId, callback, errCallback) {
             errorMessage: 'Player not found'
           });
         }
+      });
+    }
+  });
+}
+
+function updatePlayer(playerId, code, playerModifier, callback) {
+  MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
+    if (err) {
+      throw err;
+    } else {
+      const db = database.db('draft');
+      db.collection('games').find({ code: new ObjectId(code) }).toArray((err, results) => {
+        if (err || results.length === 0) {
+          errCallback({
+            status: 400,
+            errorMessage: 'Game not found.'
+          });
+          database.close();
+          return;
+        }
+
+        let result = results[0];
+        let playerMatch = result.players.filter(matchplayer => matchplayer.id.toString() === playerId.toString());
+        playerModifier(playerMatch[0]);
+        db.collection('games').update({ code: new ObjectId(code) }, result, () => {
+          database.close();
+          callback();
+        });
       });
     }
   });
@@ -426,10 +461,45 @@ router.post('/game/:gameId/player/:playerId', (req, res) => {
 router.get('/game/:gameId/player/:playerId/cards/tabletop', (req, res) => {
   let code = req.params.gameId;
   let playerId = req.params.playerId;
-  getPlayer(code, playerId, async(player) => {
-    await TabletopGenerator.generateTabletopJson('Draft pool', 'Cards from a recent draft', player.cards, req.query.addLand, (ttObject) => {
-      res.json(ttObject);
-    });
+  getPlayer(code, playerId, (player) => {
+    if (player.tabletopImages.state < 1) {
+      handleQueue(() => {
+        updatePlayer(player.id, code, (match) => {
+          match.tabletopImages.state = 1;
+        }, queueFuncComplete);
+      });
+      res.send({ status: 200, isProcessing: true });
+
+      TabletopGenerator.generateTabletopImages(
+        player.cards,
+        req.query.addLand,
+        (links, error) => {
+          handleQueue(() => {
+            updatePlayer(player.id, code, (match) => {
+              if (error) {
+                match.tabletopImages.state = -1;
+              } else {
+                match.tabletopImages.links = links;
+                match.tabletopImages.state = 2;
+              }
+            }, queueFuncComplete);
+          });
+      });
+    } else if (player.tabletopImages.state === 1) {
+      res.send({ status: 200, isProcessing: true });
+    } else {
+      res.send( {
+        status: 200,
+        isProcessing: false,
+        data: TabletopGenerator.getTabletopJson(
+          'Draft pool',
+          'Cards from a recent draft',
+          player.cards,
+          player.tabletopImages.links,
+          req.query.addLand
+        )
+      });
+    }
   }, (errResponse) => {
     res.send(errResponse);
   });

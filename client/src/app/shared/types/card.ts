@@ -3,5 +3,5 @@ export interface Card {
   name: string;
   imageUrl: string;
   description: string;
-  count?: number
+  count?: number;
 }

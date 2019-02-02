@@ -51,13 +51,90 @@ function makeChunks(array, chunkSize) {
   return chunks;
 }
 
-function imgurPostCallback(tableTopObject, cardSetsCount, callback) {
-  if (Object.keys(tableTopObject.CustomDeck).length >= cardSetsCount) {
-    callback(tabletop_entity.TabletopSave([tableTopObject]));
+function imgurPostCallback(links, cardSetsCount, callback) {
+  if (links.length === cardSetsCount) {
+    callback(links);
   }
 }
 
-async function generateTabletopJson(name, description, cards, addLand, callback) {
+function errorCallback(callback) {
+  callback([], 'failed to get imgur url');
+}
+
+async function generateTabletopImages(cards, addLand, callback) {
+  try {
+    if (addLand !== false) {
+      cards = cards.concat(lands);
+    }
+
+    let cardSets = makeChunks(reduce(cards), 69);
+    let links = [];
+
+    for (let cardset of cardSets) {
+      const width = 409;
+      const height = 585;
+      let images = [];
+      for (let card of cardset) {
+        let img = await Jimp.read(card.imageUrl);
+        img.resize(width, height);
+
+        for (let i = 0; i < card.count; i++) {
+          images.push(img);
+        }
+      }
+
+      // creates a new empty image, RGB mode, and size 4096 by 4096.
+      const dimensions = [width * 10, height * 7];
+      const newImage = new Jimp(dimensions[0], dimensions[1]);
+
+      let cur = 0;
+      for (let i = 0; i < dimensions[1]; i += height) {
+        if(cur >= images.length) {
+          break;
+        }
+
+        for (let j = 0; j < dimensions[0]; j += width) {
+          if (cur >= images.length) {
+            break;
+          }
+
+          // paste the image at location j,i:
+          newImage.composite(images[cur], j, i);
+          cur += 1;
+        }
+      }
+
+      newImage.quality(96);
+      newImage.getBase64(Jimp.MIME_JPEG, (err, b64Image) => {
+        // data to send with the POST request
+        request.post({
+          url: 'https://api.imgur.com/3/image',
+          headers: {
+            'Authorization': 'Client-ID ' + config.imgurClientId
+          },
+          formData: {
+            'image': b64Image.replace('data:image/jpeg;base64,', ''),
+            'title': 'draft_api_image'
+          }
+        }, (error, response, body) => {
+          if (error) {
+            console.log(error);
+            errorCallback(callback);
+          } else {
+            links.push(JSON.parse(body).data.link);
+            imgurPostCallback(links, cardSets.length, callback);
+          }
+        });
+      });
+    }
+  } catch (error) {
+    console.log('error happened');
+    console.log(error);
+    errorCallback(callback);
+  }
+}
+
+function getTabletopJson(name, description, cards, links, addLand) {
   if (addLand !== false) {
     cards = cards.concat(lands);
   }
@@ -65,61 +142,21 @@ async function generateTabletopJson(name, description, cards, addLand, callback)
   let cardSets = makeChunks(reduce(cards), 69);
   let tableTopObject = tabletop_entity.TabletopObjectState(name, description);
 
-  for (let cardset of cardSets) {
-    const width = 409;
-    const height = 585;
-    let images = [];
+  for (let setIndex in cardSets) {
+    const cardset = cardSets[setIndex];
     let tableCards = [];
     for (let card of cardset) {
-      let img = await Jimp.read(card.imageUrl);
-      img.resize(width, height);
-
       for (let i = 0; i < card.count; i++) {
-        images.push(img);
         tableCards.push(card);
       }
     }
+    tableTopObject.addDeck(links[setIndex], tableCards, 'magic');
+  }
 
-    // creates a new empty image, RGB mode, and size 4096 by 4096.
-    const dimensions = [width * 10, height * 7];
-    const newImage = new Jimp(dimensions[0], dimensions[1]);
-
-    let cur = 0;
-    for (let i = 0; i < dimensions[1]; i += height) {
-      if(cur >= images.length) {
-        break;
-      }
-
-      for (let j = 0; j < dimensions[0]; j += width) {
-        if (cur >= images.length) {
-          break;
-        }
-
-        // paste the image at location j,i:
-        newImage.composite(images[cur], j, i);
-        cur += 1;
-      }
-    }
-
-    newImage.quality(96);
-    newImage.getBase64(Jimp.MIME_JPEG, (err, b64Image) => {
-      // data to send with the POST request
-      request.post({
-        url: 'https://api.imgur.com/3/image',
-        headers: {
-          'Authorization': 'Client-ID ' + config.imgurClientId
-        },
-        formData: {
-          'image': b64Image.replace('data:image/jpeg;base64,', ''),
-          'title': 'draft_api_image'
-        }
-      }, (error, response, body) => {
-        console.log(error);
-        tableTopObject.addDeck(JSON.parse(body).data.link, tableCards, 'magic');
-        imgurPostCallback(tableTopObject, cardSets.length, callback);
-      });
-    });
+  if (Object.keys(tableTopObject.CustomDeck).length >= cardSets.length) {
+    return tabletop_entity.TabletopSave([tableTopObject]);
   }
 }
 
-exports.generateTabletopJson = generateTabletopJson;
+exports.getTabletopJson = getTabletopJson;
+exports.generateTabletopImages = generateTabletopImages;

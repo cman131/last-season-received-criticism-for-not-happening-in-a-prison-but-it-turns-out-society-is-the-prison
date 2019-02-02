@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { take, map } from 'rxjs/operators';
 import { GameConfig } from './types/game-config';
@@ -19,7 +19,7 @@ export class ManagementService {
 
   public createGame(gameConfig: GameConfig): Observable<GameConnection> {
     return this.http.post(this.baseUrl + '/game', gameConfig).pipe(take(1), map((response: any) => {
-      let data = response.data || {};
+      const data = response.data || {};
       return {
         code: data.code,
         playerId: data.playerId,
@@ -33,7 +33,7 @@ export class ManagementService {
     return this.http.post(this.baseUrl + '/game/' + gameConfig.code + '/player', {
       name: gameConfig.name
     }).pipe(take(1), map((response: any) => {
-      let data = response.data || {};
+      const data = response.data || {};
       return {
         code: data.code,
         playerId: data.playerId,
