@@ -8,6 +8,7 @@ export interface GameConfig {
   isPassingLeft?: boolean;
   playerId?: string;
   players?: string[];
+  packsReady?: boolean;
   cards?: Card[];
   currentPack?: string[];
   state?: number;

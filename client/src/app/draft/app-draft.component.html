@@ -59,14 +59,14 @@
         </ul>
       </div>
     </div>
-    <div *ngIf="gameConfig.state === 0"
+    <div *ngIf="gameConfig.state === 0 && gameConfig.players[0] === gameConfig.name"
       class="preview-browse sky-form-group"
     >
       <button
         class="sky-btn sky-btn-primary sky-form-control"
         type="button"
-        [title]="gameConfig.players && gameConfig.players.length <= 1 ? 'Must have at least 2 players.' : undefined"
-        [disabled]="gameConfig.players && gameConfig.players.length <= 1"
+        [title]="gameConfig.players && gameConfig.players.length <= 1 ? 'Must have at least 2 players.' : (gameConfig.packsReady ? 'Start drafting' : 'Still generating booster packs.')"
+        [disabled]="gameConfig.players && gameConfig.players.length <= 1 && gameConfig.packsReady"
         (click)="startGame()"
       >
         Start game

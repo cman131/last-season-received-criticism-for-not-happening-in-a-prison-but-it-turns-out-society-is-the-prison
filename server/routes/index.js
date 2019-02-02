@@ -241,6 +241,7 @@ function getGameConfig(code, playerId, res) {
               isPassingLeft: playerMatch[0].backupPacks.length !== 1,
               playerId: playerId,
               players: result.players.map(player => player.name),
+              packsReady: result.players.filter(player => !player.currentPack || player.currentPack.length === 0).length === 0,
               cards: playerMatch[0].cards,
               currentPack: playerMatch[0].currentPack,
               state: result.state,
@@ -270,35 +271,41 @@ function populatePacks(code, playerId, sets) {
       }
       return name.replace(/ \([a-z]\)/, '');
     }));
-    if (boosters.length === 3) {
-      MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
-        if (err) {
-          throw err;
-        }
-        const db = database.db('draft');
-        db.collection('games').find({ code: new ObjectId(code) }).toArray((err, results) => {
+    if (boosters.length === 3 && boosters[0].length === boosters[1].length && boosters[1].length === boosters[2].length) {
+      handleQueue(() => {
+        MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
           if (err) {
             throw err;
-          } else if (results.length > 0) {
-            let result = results[0];
-            let playerMatch = result.players.filter(plyr => plyr.id.toString() === playerId.toString());
-            if (playerMatch.length > 0) {
-              let player = playerMatch[0];
-              player.currentPack = boosters[0];
-              boosters.splice(0, 1);
-              player.backupPacks = boosters;
-              db.collection('games').update({ code: new ObjectId(code) }, result, (err) => {
-                if (err) {
-                  throw err;
-                }
-                database.close();
-              });
-            }
-          } else {
-            database.close();
           }
+          const db = database.db('draft');
+          db.collection('games').find({ code: new ObjectId(code) }).toArray((err, results) => {
+            if (err) {
+              throw err;
+            } else if (results.length > 0) {
+              let result = results[0];
+              let playerMatch = result.players.filter(plyr => plyr.id.toString() === playerId.toString());
+              if (playerMatch.length > 0) {
+                let player = playerMatch[0];
+                player.currentPack = boosters[0];
+                boosters.splice(0, 1);
+                player.backupPacks = boosters;
+                db.collection('games').update({ code: new ObjectId(code) }, result, (err) => {
+                  if (err) {
+                    throw err;
+                  }
+                  database.close();
+                  queueFuncComplete();
+                });
+              }
+            } else {
+              database.close();
+              queueFuncComplete();
+            }
+          });
         });
-      });
+      })
+    } else if (boosters.length === 3) {
+      populatePacks(code, playerId, sets);
     }
   };
 
