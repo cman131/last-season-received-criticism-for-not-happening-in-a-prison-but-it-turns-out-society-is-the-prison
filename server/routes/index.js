@@ -11,7 +11,16 @@ const TabletopGenerator = require('./tabletop-generator');
 let baseBoosterUrl = 'https://api.magicthegathering.io/v1/sets/{0}/booster';
 
 const requestQueue = [];
+const tabletopRequestQueue = [];
 let lock = false;
+let tabletopLock = false;
+
+const tabletopStateMap = ['Errored/NotStarted', 'Queued', 'Processing', 'Complete'];
+
+let tabletopQueueFuncComplete = () => {
+  tabletopLock = false;
+  handleTabletopQueue();
+};
 
 let queueFuncComplete = () => {
   lock = false;
@@ -34,6 +43,22 @@ let handleQueue = (requestFunc, res) => {
       } else {
         queueFuncComplete();
       }
+    }
+  }
+};
+
+let handleTabletopQueue = (requestFunc) => {
+  if (requestFunc) {
+    tabletopRequestQueue.push(requestFunc);
+  }
+  if (!tabletopLock && tabletopRequestQueue.length > 0) {
+    tabletopLock = true;
+    let request = tabletopRequestQueue[0];
+    tabletopRequestQueue.splice(0, 1);
+    try {
+      request();
+    } catch (error) {
+      tabletopQueueFuncComplete()
     }
   }
 };
@@ -62,6 +87,7 @@ function createGame(game, playerName, ip, res) {
 
       game.sets.reverse();
       db.collection('games').insertOne({
+        date: Date.now(),
         code: code,
         state: 0,
         maxPlayers: game.maxPlayers,
@@ -475,28 +501,37 @@ router.get('/game/:gameId/player/:playerId/cards/tabletop', (req, res) => {
           match.tabletopImages.state = 1;
         }, queueFuncComplete);
       });
-      res.send({ status: 200, isProcessing: true });
+      res.send({ status: 200, state: tabletopStateMap[1], isProcessing: true });
 
-      TabletopGenerator.generateTabletopImages(
-        player.cards,
-        req.query.addLand,
-        (links, error) => {
-          handleQueue(() => {
-            updatePlayer(player.id, code, (match) => {
-              if (error) {
-                match.tabletopImages.state = -1;
-              } else {
-                match.tabletopImages.links = links;
-                match.tabletopImages.state = 2;
-              }
-            }, queueFuncComplete);
-          });
+      handleTabletopQueue(() => {
+        handleQueue(() => {
+          updatePlayer(player.id, code, (match) => {
+            match.tabletopImages.state = 2;
+          }, queueFuncComplete);
+        });
+        TabletopGenerator.generateTabletopImages(
+          player.cards,
+          req.query.addLand,
+          (links, error) => {
+            handleQueue(() => {
+              updatePlayer(player.id, code, (match) => {
+                if (error) {
+                  match.tabletopImages.state = -1;
+                } else {
+                  match.tabletopImages.links = links;
+                  match.tabletopImages.state = 3;
+                }
+              }, queueFuncComplete);
+            });
+            tabletopQueueFuncComplete()
+        });
       });
-    } else if (player.tabletopImages.state === 1) {
-      res.send({ status: 200, isProcessing: true });
+    } else if (player.tabletopImages.state < 3) {
+      res.send({ status: 200, state: tabletopStateMap[player.tabletopImages.state], isProcessing: true });
     } else {
       res.send( {
         status: 200,
+        state: tabletopStateMap[player.tabletopImages.state],
         isProcessing: false,
         data: TabletopGenerator.getTabletopJson(
           'Draft pool',

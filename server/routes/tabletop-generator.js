@@ -70,6 +70,7 @@ async function generateTabletopImages(cards, addLand, callback) {
     let cardSets = makeChunks(reduce(cards), 69);
     let links = [];
 
+    console.log('1. Create card configs');
     for (let cardset of cardSets) {
       const width = 409;
       const height = 585;
@@ -87,6 +88,7 @@ async function generateTabletopImages(cards, addLand, callback) {
       const dimensions = [width * 10, height * 7];
       const newImage = new Jimp(dimensions[0], dimensions[1]);
 
+      console.log('2. Create images from config');
       let cur = 0;
       for (let i = 0; i < dimensions[1]; i += height) {
         if(cur >= images.length) {
@@ -105,8 +107,11 @@ async function generateTabletopImages(cards, addLand, callback) {
       }
 
       newImage.quality(96);
+
+      console.log('3. Combine images');
       newImage.getBase64(Jimp.MIME_JPEG, (err, b64Image) => {
         // data to send with the POST request
+        console.log('4. Post to imgur');
         request.post({
           url: 'https://api.imgur.com/3/image',
           headers: {
@@ -121,6 +126,7 @@ async function generateTabletopImages(cards, addLand, callback) {
             console.log(error);
             errorCallback(callback);
           } else {
+            console.log('5. Finish');
             links.push(JSON.parse(body).data.link);
             imgurPostCallback(links, cardSets.length, callback);
           }

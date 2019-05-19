@@ -52,6 +52,7 @@ export class AppExportComponent implements OnDestroy {
           cardDict[card.name].count += 1;
         }
         this.cards = Object.values(cardDict);
+        this.gameService.stopListener();
       }
     });
   }
