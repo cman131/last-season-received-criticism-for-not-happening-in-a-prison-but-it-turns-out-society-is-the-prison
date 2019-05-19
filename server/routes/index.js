@@ -16,6 +16,7 @@ let lock = false;
 let tabletopLock = false;
 
 const tabletopStateMap = ['Errored/NotStarted', 'Queued', 'Processing', 'Complete'];
+const landNames = ['swamp', 'forest', 'island', 'mountain', 'plains'];
 
 let tabletopQueueFuncComplete = () => {
   tabletopLock = false;
@@ -286,10 +287,12 @@ function getGameConfig(code, playerId, res) {
 
 function populatePacks(code, playerId, sets) {
   let boosters = [];
-  let boosterFulfillment = (data) => {
-    if (!data.cards) {
+  let boosterFulfillment = (data, set) => {
+    if (!data || !data.cards || data.cards.filter(item => landNames.includes(item.name.toLowerCase())).length > 1) {
+      getNewPack(set, boosterFulfillment);
       return;
     }
+
     boosters.push(data.cards.map(item => {
       let name = item.name;
       if (item.names && item.names.length > 1) {
@@ -336,17 +339,21 @@ function populatePacks(code, playerId, sets) {
   };
 
   for (let set of sets) {
-    request.get({
-      url: baseBoosterUrl.replace('{0}', set),
-      json: true,
-      headers: { 'User-Agent': 'request' }
-    }, (err, response, data) => {
-      if (err) {
-        throw err;
-      }
-      boosterFulfillment(data);
-    });
+    getNewPack(set, boosterFulfillment);
   }
+}
+
+function getNewPack(set, callback) {
+  request.get({
+    url: baseBoosterUrl.replace('{0}', set),
+    json: true,
+    headers: { 'User-Agent': 'request' }
+  }, (err, response, data) => {
+    if (err) {
+      throw err;
+    }
+    callback(data, set);
+  });
 }
 
 function pickACard(playerId, card, game) {

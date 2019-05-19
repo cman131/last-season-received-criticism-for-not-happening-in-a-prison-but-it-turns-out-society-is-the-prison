@@ -13,8 +13,7 @@ import { ScryfallService } from '../shared/scryfall.service';
 })
 export class AppDraftComponent implements OnInit, OnDestroy {
   public backupImg =
-  'https://d1u5p3l4wpay3k.cloudfront.net/mtgsalvation_gamepedia/thumb/f/f8/Magic_card_back.jpg/'
-  + '200px-Magic_card_back.jpg?version=4f6a80129fc99f07b7723141b122def4';
+  'https://c-4tvylwolbz88x24nhtlwlkphx2ejbyzljkux2ejvt.g00.gamepedia.com/g00/3_c-4tan.nhtlwlkph.jvt_/c-4TVYLWOLBZ88x24oaawzx3ax2fx2fnhtlwlkph.jbyzljku.jvtx2ftanzhschapvu_nhtlwlkphx2fmx2fm5x2fThnpj_jhyk_ihjr.qwnx3fclyzpvux3d7kkj5k18j0i36j9j0j1ii2k49336mmk4_$/$/$/$/$?i10c.ua=1&i10c.dv=15'
 
   public gameConfig: GameConfig = {
     code: '',

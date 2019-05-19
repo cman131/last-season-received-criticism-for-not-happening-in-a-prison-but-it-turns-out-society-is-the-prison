@@ -1,4 +1,3 @@
-
 <div
   class="text-export"
 >
@@ -17,7 +16,10 @@
     Copied.
   </button>
 </div>
-
+<div
+  class="vertical-dividing-line"
+>
+</div>
 <div
   class="tabletop-export"
 >
@@ -35,5 +37,6 @@
       <div></div>
     </div>
   </div>
-  <p *ngIf="tabletopDataListener">This may take a while to generate.</p>
+  <p *ngIf="tabletopGetState">State: <b>{{ tabletopGetState }}</b></p>
+  <p *ngIf="tabletopDataListener" class="deemphasized">(This may take a while to generate)</p>
 </div>

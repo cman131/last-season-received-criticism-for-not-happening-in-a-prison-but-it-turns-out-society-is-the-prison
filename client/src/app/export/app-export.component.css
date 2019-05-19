@@ -43,6 +43,18 @@
   overflow-y: auto;
 }
 
+.deemphasized {
+  font-style: italic;
+  color: #686c73;
+}
+
+.vertical-dividing-line {
+  border-left: 3px solid gray;
+  height: 500px;
+  margin-right: 50px;
+  margin-left: 50px;
+}
+
 .wait-overlay {
   position: fixed;
   width: 100%;

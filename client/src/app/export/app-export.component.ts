@@ -5,6 +5,7 @@ import { Card } from '../shared/types/card';
 import { ParamMap, ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { ValueConverter } from '@angular/compiler/src/render3/view/template';
+import { TabletopResponse } from '../shared/types/tabletop-response';
 
 @Component({
   selector: 'app-export',
@@ -16,6 +17,7 @@ export class AppExportComponent implements OnDestroy {
   public code: string;
   public playerId: string;
   public copiedState = false;
+  public tabletopGetState: string;
 
   public get cardListText(): string {
     let text = '';
@@ -75,7 +77,7 @@ export class AppExportComponent implements OnDestroy {
   public getTabletopData(): void {
     if (!this.tabletopDataListener) {
       this.checkForTabletopData();
-      this.tabletopDataListener = setInterval(() => this.checkForTabletopData(), 5000);
+      this.tabletopDataListener = setInterval(() => this.checkForTabletopData(), 3000);
     }
   }
 
@@ -87,7 +89,8 @@ export class AppExportComponent implements OnDestroy {
   }
 
   public checkForTabletopData(): void {
-    this.exportService.getTabletopJson(this.code, this.playerId).subscribe((value) => {
+    this.exportService.getTabletopJson(this.code, this.playerId).subscribe((value: TabletopResponse) => {
+      this.tabletopGetState = value.state;
       if (!value.isProcessing && value.data) {
         this.stopListener();
         const blob = new Blob([JSON.stringify(value.data)], { type: 'text/json' });
