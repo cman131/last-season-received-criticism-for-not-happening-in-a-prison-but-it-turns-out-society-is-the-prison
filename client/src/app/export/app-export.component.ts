@@ -44,7 +44,7 @@ export class AppExportComponent implements OnDestroy {
     });
 
     this.gameService.gameConfig.subscribe(config => {
-      if (config.cards) {
+      if (config.cards && config.cards.length > 0) {
         const cardDict = {};
         for (const card of config.cards) {
           if (!(card.name in cardDict)) {

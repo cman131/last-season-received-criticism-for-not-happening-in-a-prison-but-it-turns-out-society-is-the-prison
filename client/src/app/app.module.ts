@@ -16,6 +16,11 @@ import { GameService } from './shared/game.service';
 import { ScryfallService } from './shared/scryfall.service';
 import { ConfigService } from './shared/config.service';
 import { ExportService } from './shared/export.service';
+import { AppDeckBuilderComponent } from './deck-builder/app-deck-builder.component';
+import { FilterContainerComponent, FilterCheckboxComponent } from './shared/filters';
+import { CardDisplayComponent } from './deck-builder/card-display/card-display.component';
+import { SortPipe } from './shared/sort-pipe';
+import { CardFilterPipe } from './shared/card-filter-pipe';
 
 const appRoutes: Routes = [
   { path: '', component: AppHomeComponent },
@@ -23,6 +28,7 @@ const appRoutes: Routes = [
   { path: 'join', component: AppJoinComponent},
   { path: 'draft/:code/:player', component: AppDraftComponent },
   { path: 'draft/:code/:player/export', component: AppExportComponent },
+  { path: 'draft/:code/:player/export/deckbuilder', component: AppDeckBuilderComponent },
   { path: '**', component: AppHomeComponent }
 ];
 
@@ -33,7 +39,13 @@ const appRoutes: Routes = [
     AppCreateComponent,
     AppJoinComponent,
     AppDraftComponent,
-    AppExportComponent
+    AppExportComponent,
+    AppDeckBuilderComponent,
+    FilterContainerComponent,
+    FilterCheckboxComponent,
+    CardDisplayComponent,
+    SortPipe,
+    CardFilterPipe
   ],
   imports: [
     CommonModule,

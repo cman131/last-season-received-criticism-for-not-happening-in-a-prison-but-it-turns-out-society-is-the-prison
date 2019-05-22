@@ -4,4 +4,5 @@ export interface Card {
   imageUrl: string;
   description: string;
   count?: number;
+  unlimited?: boolean;
 }

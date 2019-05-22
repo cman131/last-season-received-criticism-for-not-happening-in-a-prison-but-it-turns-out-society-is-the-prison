@@ -1,0 +1,16 @@
+<h3
+  class="pointer"
+  (click)="show = !show"
+>
+  {{ label }} 
+  <i
+    class="fas chevron"
+    [ngClass]="{
+      'fa-chevron-down': !show,
+      'fa-chevron-up': show
+    }"
+    [title]="(show ? 'hide ' : 'show ') + label"
+  >
+  </i>
+</h3>
+<ng-content *ngIf="show"></ng-content>

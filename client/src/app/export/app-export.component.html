@@ -39,4 +39,14 @@
   </div>
   <p *ngIf="tabletopGetState">State: <b>{{ tabletopGetState }}</b></p>
   <p *ngIf="tabletopDataListener" class="deemphasized">(This may take a while to generate)</p>
+
+  <br><br>
+
+  <a
+    class="deckbuilder-link"
+    [routerLink]="['deckbuilder']"
+    routerLinkActive="active"
+  >
+    Open deckbuilder
+  </a>
 </div>

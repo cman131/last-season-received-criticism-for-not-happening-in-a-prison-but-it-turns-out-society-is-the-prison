@@ -1,0 +1,76 @@
+<div
+  class="collection-pane"
+>
+  <div
+    class="filter-pane"
+  >
+    <img
+      class="preview-pane-image"
+      [attr.src]="selectedCard.imageUrl || backupImg"
+    />
+    <div
+      class="preview-pane-description"
+    >
+      <p *ngIf="!selectedCard.description"
+        class="preview-pane-description-none"
+      >
+        -- No Effect --
+      </p>
+      <p *ngFor="let description of getDescriptions(selectedCard.description); last as isLast">
+        {{ description }}
+        <br *ngIf="!isLast" />
+        <br *ngIf="!isLast" />
+      </p>
+    </div>
+    <hr />
+    <h2>Filters</h2>
+    <filter-container
+      label="Search"
+    >
+      <input
+        type="text"
+        [(ngModel)]="filters.search"
+      />
+    </filter-container>
+    <filter-container
+      label="Color"
+    >
+      <ul
+        class="player-list no-select"
+      >
+        <li *ngFor="let key of getKeys(filters.color)">
+          <filter-checkbox
+            [label]="key"
+            [(model)]="filters.color[key]"
+          >
+          </filter-checkbox>
+        </li>
+      </ul>
+    </filter-container>
+  </div>
+  <div
+    id="collection-main"
+  >
+    <div
+      class="card-pane"
+    >
+      <card-display *ngFor="let card of (cards | cardFilter:filters)"
+        [card]="card"
+        [empty]="card.count === 0"
+        (clicked)="addCard(card)"
+        (selected)="updateSelected(card)"
+      >
+      </card-display>
+    </div>
+  </div>
+</div>
+<div
+  class="deck-pane"
+>
+  <card-display *ngFor="let card of activeDeck"
+    [card]="card"
+    (clicked)="removeCard(card)"
+    (selected)="updateSelected(card)"
+  >
+  </card-display>
+</div>
