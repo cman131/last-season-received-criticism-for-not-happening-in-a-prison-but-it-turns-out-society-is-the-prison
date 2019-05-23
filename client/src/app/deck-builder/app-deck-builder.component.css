@@ -25,6 +25,7 @@ ul {
 .filter-pane {
   display: inline-block;
   width: 300px;
+  max-height: 1000px;
   padding: 5px;
 }
 
@@ -72,7 +73,8 @@ ul {
 
 #collection-main {
   display: inline-block;
-  width: 100%;
+  min-width: 1111px;
+  max-height: 1000px;
   padding: 5px;
   border-left: 4px solid gray;
 }
@@ -84,7 +86,7 @@ ul {
   flex-wrap: wrap;
   align-content: flex-start;
   margin-bottom: 10px;
-  height: 700px;
+  height: 515px;
   padding: 15px;
   padding-top: 5px;
   padding-bottom: 5px;
@@ -99,11 +101,19 @@ ul {
   flex-wrap: wrap;
   align-content: flex-start;
   margin-bottom: 10px;
-  height: 300px;
-  width: 100%;
+  height: 170px;
   padding: 15px;
   padding-top: 5px;
   padding-bottom: 5px;
   overflow-x: auto;
   position: relative;
+}
+
+.card-count {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  padding: 10px;
+  border: 1px solid black;
+  background-color: white;
 }

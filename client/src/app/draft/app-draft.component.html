@@ -66,7 +66,7 @@
         class="sky-btn sky-btn-primary sky-form-control"
         type="button"
         [title]="gameConfig.players && gameConfig.players.length <= 1 ? 'Must have at least 2 players.' : (gameConfig.packsReady ? 'Start drafting' : 'Still generating booster packs.')"
-        [disabled]="gameConfig.players && gameConfig.players.length <= 1 && gameConfig.packsReady"
+        [disabled]="!gameConfig.players || gameConfig.players.length <= 1 || !gameConfig.packsReady"
         (click)="startGame()"
       >
         Start game

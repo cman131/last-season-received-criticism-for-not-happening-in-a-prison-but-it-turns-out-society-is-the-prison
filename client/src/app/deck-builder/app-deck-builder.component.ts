@@ -3,6 +3,8 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { GameService } from '../shared/game.service';
 import { take } from 'rxjs/operators';
 import { OnDestroy, Component } from '@angular/core';
+import { CardFilters, CardFilterPipe } from '../shared/card-filter-pipe';
+import { SortPipe } from '../shared/sort-pipe';
 
 @Component({
   selector: 'app-deck-builder',
@@ -13,8 +15,9 @@ export class AppDeckBuilderComponent implements OnDestroy {
   public cards: Card[] = [];
   public code: string;
   public playerId: string;
-  public filters = {
+  public filters: CardFilters = {
     color: {
+      isExact: false,
       white: true,
       blue: true,
       black: true,
@@ -44,6 +47,8 @@ export class AppDeckBuilderComponent implements OnDestroy {
       description: '({T}: Add {G}.)',
       imageUrl: 'https://img.scryfall.com/cards/large/front/5/8/58fe058d-7796-4233-8d74-2a12f9bd0023.jpg?1543675077',
       count: 1,
+      cmc: 0,
+      colors: [],
       unlimited: true
     },
     {
@@ -52,6 +57,8 @@ export class AppDeckBuilderComponent implements OnDestroy {
       description: '({T}: Add {U}.)',
       imageUrl: 'https://img.scryfall.com/cards/large/front/0/b/0ba8851d-0b25-4232-acd3-594b5b25f16e.jpg?1543675020',
       count: 1,
+      cmc: 0,
+      colors: [],
       unlimited: true
     },
     {
@@ -60,6 +67,8 @@ export class AppDeckBuilderComponent implements OnDestroy {
       description: '({T}: Add {R}.)',
       imageUrl: 'https://img.scryfall.com/cards/large/front/4/9/49ac3fd1-f732-4d96-ac93-560e4e86051e.jpg?1543675054',
       count: 1,
+      cmc: 0,
+      colors: [],
       unlimited: true
     },
     {
@@ -68,6 +77,8 @@ export class AppDeckBuilderComponent implements OnDestroy {
       description: '({T}: Add {B}.)',
       imageUrl: 'https://img.scryfall.com/cards/large/front/8/b/8bc682cd-b13b-4670-913c-70542f161316.jpg?1543675036',
       count: 1,
+      cmc: 0,
+      colors: [],
       unlimited: true
     },
     {
@@ -76,6 +87,8 @@ export class AppDeckBuilderComponent implements OnDestroy {
       description: '({T}: Add {W}.)',
       imageUrl: 'https://img.scryfall.com/cards/large/front/f/e/feada93b-aabf-45d6-ac46-98b33caf9112.jpg?1543675002',
       count: 1,
+      cmc: 0,
+      colors: [],
       unlimited: true
     }
   ];

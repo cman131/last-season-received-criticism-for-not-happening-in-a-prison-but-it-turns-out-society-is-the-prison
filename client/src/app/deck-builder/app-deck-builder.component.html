@@ -40,8 +40,9 @@
       >
         <li *ngFor="let key of getKeys(filters.color)">
           <filter-checkbox
+            [name]="key"
             [label]="key"
-            [(model)]="filters.color[key]"
+            [(ngModel)]="filters.color[key]"
           >
           </filter-checkbox>
         </li>
@@ -51,10 +52,15 @@
   <div
     id="collection-main"
   >
+    <h2
+      class="deck-bar"
+    >
+      Collection:
+    </h2>
     <div
       class="card-pane"
     >
-      <card-display *ngFor="let card of (cards | cardFilter:filters)"
+      <card-display *ngFor="let card of (cards | cardFilter:filters | sort:'cmc')"
         [card]="card"
         [empty]="card.count === 0"
         (clicked)="addCard(card)"
@@ -62,15 +68,25 @@
       >
       </card-display>
     </div>
+    <h2
+      class="deck-bar"
+    >
+      Deck:
+    </h2>
+    <div
+      class="deck-pane"
+    >
+      <p *ngIf="activeDeck.length > 0"
+        class="card-count no-select"
+      >
+        {{ activeDeck.length }}
+      </p>
+      <card-display *ngFor="let card of (activeDeck | sort:'cmc')"
+        [card]="card"
+        (clicked)="removeCard(card)"
+        (selected)="updateSelected(card)"
+      >
+      </card-display>
+    </div>
   </div>
-</div>
-<div
-  class="deck-pane"
->
-  <card-display *ngFor="let card of activeDeck"
-    [card]="card"
-    (clicked)="removeCard(card)"
-    (selected)="updateSelected(card)"
-  >
-  </card-display>
 </div>
