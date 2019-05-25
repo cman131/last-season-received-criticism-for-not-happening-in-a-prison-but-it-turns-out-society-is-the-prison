@@ -147,6 +147,9 @@ function joinGame(code, playerName, ip, res) {
           } else if (result.maxPlayers === result.players.length) {
             send(res, 400, undefined, 'Game is full');
             database.close();
+          } else if (result.state === 1) {
+            send(res, 400, undefined, 'Game already in progress');
+            database.close();
           } else {
             db.collection('games').update({
               code: new ObjectId(code)
