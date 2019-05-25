@@ -74,23 +74,23 @@
       <div
         class="deck-management-options"
       >
-        <button
+        <draft-button
           class="sky-btn sky-btn-primary sky-form-control"
           type="button"
           [disabled]="isSaving || !activeDeck.name"
           [title]="getSaveButtonTitle()"
-          (click)="save()"
+          (clicked)="save()"
         >
           Save
-        </button>
-        <button
+        </draft-button>
+        <draft-button
           class="sky-btn sky-btn-primary sky-form-control"
-          routerLinkActive="active"
           title="New deck"
           [routerLink]="['/deckbuilder', activeDeck.gameId, activeDeck.playerId]"
+          (clicked)="newDeck()"
         >
           New Deck
-        </button>
+        </draft-button>
       </div>
       <filter-container *ngIf="deckList && deckList.length > 0"
         label="Load deck"

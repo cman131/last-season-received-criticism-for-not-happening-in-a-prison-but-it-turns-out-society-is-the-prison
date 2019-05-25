@@ -62,26 +62,29 @@
     <div *ngIf="gameConfig.state === 0 && gameConfig.players[0] === gameConfig.name"
       class="preview-browse sky-form-group"
     >
-      <button
+      <draft-button
         class="sky-btn sky-btn-primary sky-form-control"
         type="button"
-        [title]="gameConfig.players && gameConfig.players.length <= 1 ? 'Must have at least 2 players.' : (gameConfig.packsReady ? 'Start drafting' : 'Still generating booster packs.')"
         [disabled]="!gameConfig.players || gameConfig.players.length <= 1 || !gameConfig.packsReady"
-        (click)="startGame()"
+        [isPrimary]="true"
+        [title]="gameConfig.players && gameConfig.players.length <= 1 ? 'Must have at least 2 players.' : (gameConfig.packsReady ? 'Start drafting' : 'Still generating booster packs.')"
+        (clicked)="startGame()"
       >
         Start game
-      </button>
+      </draft-button>
     </div>
     <div *ngIf="gameConfig.state === 1"
       class="preview-browse sky-form-group"
     >
-      <button
+      <draft-button
         class="sky-btn sky-btn-primary sky-form-control"
         type="button"
-        (click)="browseCards = !browseCards"
+        [title]="browseCards ? 'Hide' : 'Show'"
+        [isPrimary]="browseCards"
+        (clicked)="browseCards = !browseCards"
       >
         {{ browseCards ? 'Hide' : 'Show' }} picked cards
-      </button>
+      </draft-button>
     </div>
     <div *ngIf="gameConfig.done"
       class="preview-export sky-form-group"
@@ -137,13 +140,12 @@
     >
       Cards: {{ currentPack.length }}
     </p>
-    <img *ngFor="let card of currentPack"
-      class="card"
-      [src]="card.imageUrl"
-      [title]="card.name"
-      (click)="submitChoice(card)"
-      (mouseenter)="updateSelected(card)"
-    />
+    <card-display *ngFor="let card of currentPack"
+      [card]="card"
+      (clicked)="submitChoice(card)"
+      (selected)="updateSelected(card)"
+    >
+    </card-display>
   </div>
   <div *ngIf="!browseCards && (currentPack.length === 0 || gameConfig.state !== 1)"
     class="ripple-pane"

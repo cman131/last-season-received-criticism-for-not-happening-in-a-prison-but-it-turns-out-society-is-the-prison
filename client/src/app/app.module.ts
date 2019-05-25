@@ -22,6 +22,7 @@ import { CardDisplayComponent } from './deck-builder/card-display/card-display.c
 import { SortPipe } from './shared/sort-pipe';
 import { CardFilterPipe } from './shared/card-filter-pipe';
 import { DeckService } from './shared/deck.service';
+import { DraftButtonComponent } from './shared/draft-button/draft-button.component';
 
 const appRoutes: Routes = [
   { path: '', component: AppHomeComponent },
@@ -48,7 +49,8 @@ const appRoutes: Routes = [
     FilterCheckboxComponent,
     CardDisplayComponent,
     SortPipe,
-    CardFilterPipe
+    CardFilterPipe,
+    DraftButtonComponent
   ],
   imports: [
     CommonModule,

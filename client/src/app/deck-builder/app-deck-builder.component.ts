@@ -69,7 +69,7 @@ export class AppDeckBuilderComponent implements OnDestroy {
       if (this.activeDeck.deckId) {
         this.load(this.activeDeck.deckId);
       } else {
-        this.gameService.setConfigListener(this.activeDeck.gameId, this.activeDeck.playerId);
+        this.newDeck();
         this.gameService.gameConfig.subscribe(config => {
           if (config.cards && config.cards.length > 0) {
             const cardDict = {};
@@ -83,6 +83,9 @@ export class AppDeckBuilderComponent implements OnDestroy {
                 cardDict[card.name].unlimited = false;
               }
             }
+            this.activeDeck.deckId = undefined;
+            this.activeDeck.name = '';
+            this.activeDeck.mainBoard = [];
             this.activeDeck.sideBoard = Object.values(cardDict);
             this.activeDeck.sideBoard = this.activeDeck.sideBoard.concat(this.lands);
             this.gameService.stopListener();
@@ -133,6 +136,11 @@ export class AppDeckBuilderComponent implements OnDestroy {
     } else {
       card.count -= 1;
     }
+  }
+
+  public newDeck(): void {
+    this.isLoading = true;
+    this.gameService.setConfigListener(this.activeDeck.gameId, this.activeDeck.playerId);
   }
 
   public load(deckId): void {

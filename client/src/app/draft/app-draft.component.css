@@ -128,11 +128,11 @@ ul {
   height: 154.44px;
   flex: 0 0 100.8px;
   margin: 5px;
-  cursor: pointer;
 }
 
 .card-count {
   position: absolute;
+  z-index: 20;
   top: 0;
   right: 15px;
   padding: 10px;
