@@ -10,6 +10,11 @@
   border-radius: 6px;
   margin: 5px;
   cursor: pointer;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-touch-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
 }
 .card.empty {
   filter: grayscale(100%);

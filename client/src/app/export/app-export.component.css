@@ -36,6 +36,11 @@
   padding: 6px 12px;
   line-height: 1.42857;
   font-size: 15px;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-touch-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
 }
 
 .btn-primary {
