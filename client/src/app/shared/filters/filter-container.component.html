@@ -1,6 +1,36 @@
-<h3
-  class="pointer"
-  (click)="show = !show"
+<h1 *ngIf="size <= 1"
+  class="container-label"
+  (click)="toggleShow()"
+>
+  {{ label }} 
+  <i
+    class="fas chevron"
+    [ngClass]="{
+      'fa-chevron-down': !show,
+      'fa-chevron-up': show
+    }"
+    [title]="(show ? 'hide ' : 'show ') + label"
+  >
+  </i>
+</h1>
+<h2 *ngIf="size === 2"
+  class="container-label"
+  (click)="toggleShow()"
+>
+  {{ label }} 
+  <i
+    class="fas chevron"
+    [ngClass]="{
+      'fa-chevron-down': !show,
+      'fa-chevron-up': show
+    }"
+    [title]="(show ? 'hide ' : 'show ') + label"
+  >
+  </i>
+</h2>
+<h3 *ngIf="size === 3"
+  class="container-label"
+  (click)="toggleShow()"
 >
   {{ label }} 
   <i
@@ -13,4 +43,19 @@
   >
   </i>
 </h3>
+<h4 *ngIf="size > 3"
+  class="container-label"
+  (click)="toggleShow()"
+>
+  {{ label }} 
+  <i
+    class="fas chevron"
+    [ngClass]="{
+      'fa-chevron-down': !show,
+      'fa-chevron-up': show
+    }"
+    [title]="(show ? 'hide ' : 'show ') + label"
+  >
+  </i>
+</h4>
 <ng-content *ngIf="show"></ng-content>

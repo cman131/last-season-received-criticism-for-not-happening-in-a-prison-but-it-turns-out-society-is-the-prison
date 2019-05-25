@@ -90,7 +90,7 @@
         Drafting complete: 
         <a
           class="sky-btn sky-btn-primary sky-form-control"
-          [routerLink]="['export']"
+          [routerLink]="['/export', gameConfig.code, gameConfig.playerId]"
           routerLinkActive="active"
         >
           Export cards

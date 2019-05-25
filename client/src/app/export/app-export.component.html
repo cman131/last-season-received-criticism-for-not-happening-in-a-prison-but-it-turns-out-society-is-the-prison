@@ -1,52 +1,129 @@
-<div
-  class="text-export"
+<div *ngIf="deckId"
+  class="tabset"
 >
-  <h2>Text format:</h2>
-  <pre class="text-output">{{ cardListText }}</pre>
-  <button *ngIf="!copiedState"
-    class="btn copy-btn"
-    (click)="copyText()"
-  >
-    Copy to clipboard
-  </button>
-  <button *ngIf="copiedState"
-    class="btn copy-btn"
-    disabled="true"
-  >
-    Copied.
-  </button>
-</div>
-<div
-  class="vertical-dividing-line"
->
-</div>
-<div
-  class="tabletop-export"
->
-  <button *ngIf="!tabletopDataListener"
-    class="btn btn-primary"
-    (click)="getTabletopData()"
-  >
-    Export to tabletop
-  </button>
-  <div *ngIf="tabletopDataListener">
-    <div
-      class="lds-ripple"
-    >
-      <div></div>
-      <div></div>
-    </div>
-  </div>
-  <p *ngIf="tabletopGetState">State: <b>{{ tabletopGetState }}</b></p>
-  <p *ngIf="tabletopDataListener" class="deemphasized">(This may take a while to generate)</p>
-
-  <br><br>
-
   <a
-    class="deckbuilder-link"
-    [routerLink]="['deckbuilder']"
-    routerLinkActive="active"
+    class="tab"
+    [ngClass]="{
+      'active': deckActive
+    }"
+    (click)="deckActive = true"
   >
-    Open deckbuilder
+    {{ deck ? deck.name : 'Deck' }}
   </a>
+  <a
+    class="tab"
+    [ngClass]="{
+      'active': !deckActive
+    }"
+    (click)="deckActive = false"
+  >
+    Draft pool
+  </a>
+</div>
+<div *ngIf="deckActive && deck"
+  class="export-pane"
+>
+  <div
+    class="text-export"
+  >
+    <h2>Text format:</h2>
+    <pre class="text-output">{{ deckListText }}</pre>
+    <button *ngIf="!deckCopiedState"
+      class="btn copy-btn"
+      (click)="copyText(deckListText, true)"
+    >
+      Copy to clipboard
+    </button>
+    <button *ngIf="deckCopiedState"
+      class="btn copy-btn"
+      disabled="true"
+    >
+      Copied.
+    </button>
+  </div>
+  <div
+    class="vertical-dividing-line"
+  >
+  </div>
+  <div
+    class="tabletop-export"
+  >
+    <button *ngIf="!deckTabletopDataListener"
+      class="btn btn-primary"
+      (click)="getDeckTabletopData()"
+    >
+      Export to tabletop
+    </button>
+    <div *ngIf="deckTabletopDataListener">
+      <div
+        class="lds-ripple"
+      >
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+    <p *ngIf="deckTabletopGetState">State: <b>{{ deckTabletopGetState }}</b></p>
+    <p *ngIf="deckTabletopDataListener" class="deemphasized">(This may take a while to generate)</p>
+    <a
+      class="deckbuilder-link"
+      [routerLink]="['/deckbuilder', code, playerId, deckId]"
+      routerLinkActive="active"
+    >
+      Open in deckbuilder
+    </a>
+  </div>
+</div>
+<div *ngIf="!deckActive"
+  class="export-pane"
+>
+  <div
+    class="text-export"
+  >
+    <h2>Text format:</h2>
+    <pre class="text-output">{{ cardListText }}</pre>
+    <button *ngIf="!copiedState"
+      class="btn copy-btn"
+      (click)="copyText(cardListText)"
+    >
+      Copy to clipboard
+    </button>
+    <button *ngIf="copiedState"
+      class="btn copy-btn"
+      disabled="true"
+    >
+      Copied.
+    </button>
+  </div>
+  <div
+    class="vertical-dividing-line"
+  >
+  </div>
+  <div
+    class="tabletop-export"
+  >
+    <button *ngIf="!tabletopDataListener"
+      class="btn btn-primary"
+      (click)="getTabletopData()"
+    >
+      Export to tabletop
+    </button>
+    <div *ngIf="tabletopDataListener">
+      <div
+        class="lds-ripple"
+      >
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+    <p *ngIf="tabletopGetState">State: <b>{{ tabletopGetState }}</b></p>
+    <p *ngIf="tabletopDataListener" class="deemphasized">(This may take a while to generate)</p>
+
+    <a
+      class="deckbuilder-link"
+      [routerLink]="['/deckbuilder', code, playerId]"
+      routerLinkActive="active"
+    >
+      Open in deckbuilder
+    </a>
+  </div>
 </div>

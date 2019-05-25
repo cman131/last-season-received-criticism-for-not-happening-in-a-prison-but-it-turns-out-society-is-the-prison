@@ -1,10 +1,13 @@
 import { Card } from '../shared/types/card';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { GameService } from '../shared/game.service';
 import { take } from 'rxjs/operators';
 import { OnDestroy, Component } from '@angular/core';
 import { CardFilters, CardFilterPipe } from '../shared/card-filter-pipe';
 import { SortPipe } from '../shared/sort-pipe';
+import { DeckService } from '../shared/deck.service';
+import { Deck } from '../shared/types/deck';
+import { LandRef } from '../shared/land-ref';
 
 @Component({
   selector: 'app-deck-builder',
@@ -12,9 +15,6 @@ import { SortPipe } from '../shared/sort-pipe';
   styleUrls: ['./app-deck-builder.component.css']
 })
 export class AppDeckBuilderComponent implements OnDestroy {
-  public cards: Card[] = [];
-  public code: string;
-  public playerId: string;
   public filters: CardFilters = {
     color: {
       isExact: false,
@@ -25,10 +25,19 @@ export class AppDeckBuilderComponent implements OnDestroy {
       green: true,
       colorless: true
     },
-    search: ''
+    search: '',
   };
+  public showFilters = false;
+  public showManagement = true;
 
-  public activeDeck: Card[] = [];
+  public deckList: Deck[] = [];
+  public activeDeck: Deck = {
+    playerId: '',
+    gameId: '',
+    name: '',
+    mainBoard: [],
+    sideBoard: []
+  };
   public selectedCard: Card = {
     id: '',
     name: '',
@@ -39,89 +48,52 @@ export class AppDeckBuilderComponent implements OnDestroy {
   public backupImg =
   // tslint:disable-next-line:max-line-length
   'https://c-4tvylwolbz88x24nhtlwlkphx2ejbyzljkux2ejvt.g00.gamepedia.com/g00/3_c-4tan.nhtlwlkph.jvt_/c-4TVYLWOLBZ88x24oaawzx3ax2fx2fnhtlwlkph.jbyzljku.jvtx2ftanzhschapvu_nhtlwlkphx2fmx2fm5x2fThnpj_jhyk_ihjr.qwnx3fclyzpvux3d7kkj5k18j0i36j9j0j1ii2k49336mmk4_$/$/$/$/$?i10c.ua=1&i10c.dv=15';
-  public landNames = ['forest', 'mountain', 'swamp', 'plains', 'island'];
-  public lands: Card[] = [
-    {
-      id: 'a9d61651-349e-40d0-a7c4-c9561e190405',
-      name: 'Forest',
-      description: '({T}: Add {G}.)',
-      imageUrl: 'https://img.scryfall.com/cards/large/front/5/8/58fe058d-7796-4233-8d74-2a12f9bd0023.jpg?1543675077',
-      count: 1,
-      cmc: 0,
-      colors: [],
-      unlimited: true
-    },
-    {
-      id: '7014b9fc-a906-4ffd-a482-22ba8dbe3b4a',
-      name: 'Island',
-      description: '({T}: Add {U}.)',
-      imageUrl: 'https://img.scryfall.com/cards/large/front/0/b/0ba8851d-0b25-4232-acd3-594b5b25f16e.jpg?1543675020',
-      count: 1,
-      cmc: 0,
-      colors: [],
-      unlimited: true
-    },
-    {
-      id: '489fdba7-5c25-4cf3-a1e0-3e0fda6c6ee6',
-      name: 'Mountain',
-      description: '({T}: Add {R}.)',
-      imageUrl: 'https://img.scryfall.com/cards/large/front/4/9/49ac3fd1-f732-4d96-ac93-560e4e86051e.jpg?1543675054',
-      count: 1,
-      cmc: 0,
-      colors: [],
-      unlimited: true
-    },
-    {
-      id: '24eeb424-235d-4346-9355-57914e740ec6',
-      name: 'Swamp',
-      description: '({T}: Add {B}.)',
-      imageUrl: 'https://img.scryfall.com/cards/large/front/8/b/8bc682cd-b13b-4670-913c-70542f161316.jpg?1543675036',
-      count: 1,
-      cmc: 0,
-      colors: [],
-      unlimited: true
-    },
-    {
-      id: 'd92ef517-2417-43a2-8b1a-0673d1531c65',
-      name: 'Plains',
-      description: '({T}: Add {W}.)',
-      imageUrl: 'https://img.scryfall.com/cards/large/front/f/e/feada93b-aabf-45d6-ac46-98b33caf9112.jpg?1543675002',
-      count: 1,
-      cmc: 0,
-      colors: [],
-      unlimited: true
-    }
-  ];
+  public landNames = LandRef.landNames;
+  public lands = LandRef.lands;
 
+  public isSaving = false;
+  public isLoading = true;
   public getKeys = Object.keys;
 
   constructor(
     private route: ActivatedRoute,
-    private gameService: GameService
+    private gameService: GameService,
+    private deckService: DeckService,
+    private router: Router
   ) {
     this.route.paramMap.pipe(take(1)).subscribe((params: ParamMap) => {
-      this.code = params.get('code');
-      this.playerId = params.get('player');
-      this.gameService.setConfigListener(this.code, this.playerId);
+      this.activeDeck.gameId = params.get('code');
+      this.activeDeck.playerId = params.get('player');
+      this.activeDeck.deckId = params.get('deckId') || undefined;
+      this.deckService.reloadDeckList(this.activeDeck.playerId, this.activeDeck.gameId);
+      if (this.activeDeck.deckId) {
+        this.load(this.activeDeck.deckId);
+      } else {
+        this.gameService.setConfigListener(this.activeDeck.gameId, this.activeDeck.playerId);
+        this.gameService.gameConfig.subscribe(config => {
+          if (config.cards && config.cards.length > 0) {
+            const cardDict = {};
+            for (const card of config.cards) {
+              if (this.landNames.indexOf(card.name.toLowerCase()) < 0) {
+                if (!(card.name in cardDict)) {
+                  cardDict[card.name] = card;
+                  cardDict[card.name].count = 0;
+                }
+                cardDict[card.name].count += 1;
+                cardDict[card.name].unlimited = false;
+              }
+            }
+            this.activeDeck.sideBoard = Object.values(cardDict);
+            this.activeDeck.sideBoard = this.activeDeck.sideBoard.concat(this.lands);
+            this.gameService.stopListener();
+            this.isLoading = false;
+          }
+        });
+      }
     });
 
-    this.gameService.gameConfig.subscribe(config => {
-      if (config.cards && config.cards.length > 0) {
-        const cardDict = {};
-        for (const card of config.cards) {
-          if (this.landNames.indexOf(card.name.toLowerCase()) < 0) {
-            if (!(card.name in cardDict)) {
-              cardDict[card.name] = card;
-              cardDict[card.name].count = 0;
-            }
-            cardDict[card.name].count += 1;
-            cardDict[card.name].unlimited = false;
-          }
-        }
-        this.cards = Object.values(cardDict);
-        this.cards = this.cards.concat(this.lands);
-        this.gameService.stopListener();
-      }
+    this.deckService.deckList.subscribe(deckList => {
+      this.deckList = deckList;
     });
   }
 
@@ -131,11 +103,11 @@ export class AppDeckBuilderComponent implements OnDestroy {
 
   public addCard(card: Card) {
     if (card.count > 0) {
-      const filteredDeck = this.activeDeck.filter(item => item.name === card.name);
+      const filteredDeck = this.activeDeck.mainBoard.filter(item => item.name === card.name);
       if (filteredDeck.length > 0) {
         filteredDeck.pop().count += 1;
       } else {
-        this.activeDeck.push({
+        this.activeDeck.mainBoard.push({
           ...card,
           count: 1
         });
@@ -147,19 +119,44 @@ export class AppDeckBuilderComponent implements OnDestroy {
   }
 
   public removeCard(card: Card) {
-    const filteredCollection = this.cards.filter(item => item.name === card.name);
+    const filteredCollection = this.activeDeck.sideBoard.filter(item => item.name === card.name);
     if (!card.unlimited && filteredCollection.length > 0) {
       filteredCollection.pop().count += 1;
     } else if (!card.unlimited) {
-      this.cards.push({
+      this.activeDeck.sideBoard.push({
         ...card,
         count: 1
       });
     }
     if (card.count <= 1) {
-      this.activeDeck = this.activeDeck.filter(item => item.name !== card.name);
+      this.activeDeck.mainBoard = this.activeDeck.mainBoard.filter(item => item.name !== card.name);
     } else {
       card.count -= 1;
+    }
+  }
+
+  public load(deckId): void {
+    this.isLoading = true;
+    this.deckService.load(this.activeDeck.playerId, this.activeDeck.gameId, deckId).subscribe((deck: Deck) => {
+      this.isLoading = false;
+      if (deck && deck.sideBoard && deck.sideBoard.length > 0) {
+        this.activeDeck = deck;
+      }
+    });
+  }
+
+  public save(): void {
+    if (!this.isSaving && this.activeDeck.name) {
+      this.isSaving = true;
+      this.deckService.save(
+        this.activeDeck.playerId,
+        this.activeDeck.gameId,
+        this.activeDeck
+      ).subscribe((deckId) => {
+        this.isSaving = false;
+        this.activeDeck.deckId = deckId;
+        this.deckService.reloadDeckList(this.activeDeck.playerId, this.activeDeck.gameId);
+      });
     }
   }
 
@@ -169,5 +166,22 @@ export class AppDeckBuilderComponent implements OnDestroy {
 
   public getDescriptions(description) {
     return description.split('<br/>');
+  }
+
+  public getCardCount(cards: Card[]) {
+    if (cards.length === 0) {
+      return 0;
+    }
+    return cards.map(card => card.count).reduce((prev, cur) => prev + cur);
+  }
+
+  public getSaveButtonTitle() {
+    if (this.isSaving) {
+      return 'Saving...';
+    } else if (!this.activeDeck.name) {
+      return 'Please give the deck a name before saving.';
+    } else {
+      return 'Save this deck';
+    }
   }
 }

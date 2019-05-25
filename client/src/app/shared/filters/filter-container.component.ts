@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -8,8 +8,21 @@ import { Component, Input } from '@angular/core';
 })
 export class FilterContainerComponent {
   @Input()
+  public size = 3;
+
+  @Input()
   public show = false;
 
   @Input()
   public label: string;
+
+  @Output()
+  public opened = new EventEmitter();
+
+  public toggleShow(): void {
+    this.show = !this.show;
+    if (this.show) {
+      this.opened.emit();
+    }
+  }
 }
