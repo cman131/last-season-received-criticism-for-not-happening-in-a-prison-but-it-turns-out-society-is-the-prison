@@ -1,0 +1,36 @@
+:host() {
+  position: relative;
+}
+
+.card {
+  width: 110.88px;
+  height: 154.44px;
+  flex: 0 0 100.8px;
+  border: 2px solid white;
+  border-radius: 6px;
+  margin: 5px;
+  cursor: pointer;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-touch-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+}
+.card.empty {
+  filter: grayscale(100%);
+  cursor: initial;
+}
+
+.card:hover:not(.empty) {
+  border: 2px solid blue;
+}
+
+.card-count {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  padding: 2px;
+  border: 1px solid black;
+  background-color: white;
+  cursor: pointer;
+}

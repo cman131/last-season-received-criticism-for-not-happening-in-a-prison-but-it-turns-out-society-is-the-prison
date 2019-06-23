@@ -22,4 +22,10 @@ export class ExportService {
       this.baseUrl + '/game/' + code + '/player/' + playerId + '/cards/tabletop?addLand=' + (addLand ? 'true' : 'false')
     ).pipe(take(1)).pipe(map(value => value as TabletopResponse));
   }
+
+  public getDeckTabletopJson(code: string, playerId: string, deckId: string, addLand = false): Observable<TabletopResponse> {
+    return this.http.get(
+      this.baseUrl + '/game/' + code + '/player/' + playerId + '/deck/' + deckId + '/tabletop?addLand=' + (addLand ? 'true' : 'false')
+    ).pipe(take(1)).pipe(map(value => value as TabletopResponse));
+  }
 }

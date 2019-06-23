@@ -1,0 +1,12 @@
+.chevron {
+  padding-left: 2px;
+}
+
+.container-label {
+  cursor: pointer;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-touch-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+}

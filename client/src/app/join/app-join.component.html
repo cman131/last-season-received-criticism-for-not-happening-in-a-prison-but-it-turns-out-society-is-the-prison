@@ -39,11 +39,11 @@
   <div
     class="form-content"
   >
-    <button
-      (click)="submit()"
+    <draft-button
+      (clicked)="submit()"
       [disabled]="!game.name || !game.code"
     >
       Join game
-    </button>
+    </draft-button>
   </div>
 </div>

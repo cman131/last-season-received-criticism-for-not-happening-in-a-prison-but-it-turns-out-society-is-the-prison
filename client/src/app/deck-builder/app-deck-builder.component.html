@@ -1,0 +1,181 @@
+<div *ngIf="!isLoading"
+  class="collection-pane"
+>
+  <div
+    class="filter-pane"
+  >
+    <img
+      class="preview-pane-image"
+      [attr.src]="selectedCard.imageUrl || backupImg"
+    />
+    <div
+      class="preview-pane-description"
+    >
+      <p *ngIf="!selectedCard.description"
+        class="preview-pane-description-none"
+      >
+        -- No Effect --
+      </p>
+      <p *ngFor="let description of getDescriptions(selectedCard.description); last as isLast">
+        {{ description }}
+        <br *ngIf="!isLast" />
+        <br *ngIf="!isLast" />
+      </p>
+    </div>
+    <hr />
+    <filter-container
+      label="Filters"
+      [size]="2"
+      [show]="showFilters"
+      (opened)="showManagement = false; showFilters = true;"
+    >
+      <filter-container
+        label="Search"
+      >
+        <input
+          type="text"
+          [(ngModel)]="filters.search"
+        />
+      </filter-container>
+      <filter-container
+        label="Color"
+      >
+        <ul
+          class="player-list no-select"
+        >
+          <li *ngFor="let key of getKeys(filters.color)">
+            <filter-checkbox
+              [name]="key"
+              [label]="key"
+              [(ngModel)]="filters.color[key]"
+            >
+            </filter-checkbox>
+          </li>
+        </ul>
+      </filter-container>
+    </filter-container>
+    <hr />
+    <filter-container
+      label="Deck management"
+      [size]="2"
+      [show]="showManagement"
+      (opened)="showFilters = false"
+      (opened)="showFilters = false; showManagement = true;"
+    >
+      <label
+        style="display: block;"
+      >
+        DeckName: 
+        <input
+          type="text"
+          [(ngModel)]="activeDeck.name"
+        />
+      </label>
+      <div
+        class="deck-management-options"
+      >
+        <draft-button
+          class="sky-btn sky-btn-primary sky-form-control"
+          type="button"
+          [disabled]="isSaving || !activeDeck.name"
+          [title]="getSaveButtonTitle()"
+          (clicked)="save()"
+        >
+          Save
+        </draft-button>
+        <draft-button
+          class="sky-btn sky-btn-primary sky-form-control"
+          title="New deck"
+          [routerLink]="['/deckbuilder', activeDeck.gameId, activeDeck.playerId]"
+          (clicked)="newDeck()"
+        >
+          New Deck
+        </draft-button>
+      </div>
+      <filter-container *ngIf="deckList && deckList.length > 0"
+        label="Load deck"
+      >
+        <ul
+          class="player-list no-select"
+        >
+          <li *ngFor="let deck of deckList"
+            [title]="deck.deckId === activeDeck.deckId ? 'Active deck' : undefined"
+          >
+            <a *ngIf="deck.deckId !== activeDeck.deckId"
+              class="sky-btn sky-btn-primary sky-form-control"
+              routerLinkActive="active"
+              title="load deck"
+              [routerLink]="['/deckbuilder', activeDeck.gameId, activeDeck.playerId, deck.deckId]"
+              (click)="load(deck.deckId)"
+            >
+              {{ deck.name }}
+            </a>
+            <i *ngIf="deck.deckId === activeDeck.deckId">
+              {{ deck.name }}
+            </i>
+          </li>
+        </ul>
+      </filter-container>
+    </filter-container>
+    <hr *ngIf="activeDeck && !isSaving && !!activeDeck.deckId" />
+    <a *ngIf="activeDeck && !isSaving && !!activeDeck.deckId"
+      class="sky-btn sky-btn-primary sky-form-control"
+      [routerLink]="['/export', activeDeck.gameId, activeDeck.playerId, activeDeck.deckId]"
+      routerLinkActive="active"
+    >
+      Export deck
+    </a>
+  </div>
+  <div
+    id="collection-main"
+  >
+    <h2
+      class="deck-bar"
+    >
+      Collection:
+    </h2>
+    <div
+      class="card-pane"
+    >
+      <card-display *ngFor="let card of (activeDeck.sideBoard | cardFilter:filters | sort:'cmc')"
+        [card]="card"
+        [empty]="card.count === 0"
+        (clicked)="addCard(card)"
+        (selected)="updateSelected(card)"
+      >
+      </card-display>
+    </div>
+    <h2
+      class="deck-bar"
+    >
+      Deck:
+      <p *ngIf="getCardCount(activeDeck.mainBoard) > 0"
+        class="card-count no-select"
+      >
+        {{ getCardCount(activeDeck.mainBoard) }}
+      </p>
+    </h2>
+    <div
+      class="deck-pane"
+    >
+      <card-display *ngFor="let card of (activeDeck.mainBoard | sort:'cmc')"
+        [card]="card"
+        (clicked)="removeCard(card)"
+        (selected)="updateSelected(card)"
+      >
+      </card-display>
+    </div>
+  </div>
+</div>
+<div *ngIf="isLoading"
+  class="ripple-pane"
+>
+  <div>
+    <div
+      class="lds-ripple"
+    >
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+</div>

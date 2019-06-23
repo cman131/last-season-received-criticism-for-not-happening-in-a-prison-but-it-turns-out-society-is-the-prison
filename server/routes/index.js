@@ -65,6 +65,7 @@ let handleTabletopQueue = (requestFunc) => {
 };
 
 function send(res, status, data, errorMessage) {
+  res.status(status || 500);
   res.send({ status: status || 500, errorMessage: errorMessage, data: data });
   queueFuncComplete();
 }
@@ -145,6 +146,9 @@ function joinGame(code, playerName, ip, res) {
             database.close();
           } else if (result.maxPlayers === result.players.length) {
             send(res, 400, undefined, 'Game is full');
+            database.close();
+          } else if (result.state === 1) {
+            send(res, 400, undefined, 'Game already in progress');
             database.close();
           } else {
             db.collection('games').update({
@@ -470,6 +474,132 @@ function updatePlayer(playerId, code, playerModifier, callback) {
   });
 }
 
+function getDeck(deckId, callback, errCallback) {
+  MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
+    if (err) {
+      errCallback({
+        status: 500,
+        error: err
+      })
+    } else {
+      const db = database.db('draft');
+      db.collection('decks').find({
+        deckId: new ObjectId(deckId)
+      }).toArray((err, results) => {
+        if (err || results.length === 0) {
+          database.close();
+          errCallback({
+            status: 400,
+            errorMessage: 'Deck not found.'
+          });
+        } else {
+          let result = results[0];
+          database.close();
+          callback(result);
+        }
+      });
+    }
+  });
+}
+
+function getDeckList(playerId, gameId, res) {
+  MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
+    if (err) {
+      throw err;
+    } else {
+      const db = database.db('draft');
+      db.collection('decks').find({
+        gameId: new ObjectId(gameId),
+        playerId: new ObjectId(playerId)
+      }).toArray((err, results) => {
+        if (err || results.length === 0) {
+          database.close();
+          res.status(400);
+          res.send({
+            status: 400,
+            errorMessage: 'Deck not found.'
+          });
+        } else {
+          database.close();
+          res.status(200);
+          res.send({
+            status: 200,
+            data: results.map(deck => ({
+              gameId: deck.gameId,
+              playerId: deck.playerId,
+              deckId: deck.deckId,
+              name: deck.name
+            }))
+          })
+        }
+      });
+    }
+  });
+}
+
+function createDeck(playerIdentifier, gameIdentifier, deck, res) {
+  MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
+    if (err) {
+      database.close();
+      throw err;
+    } else {
+      let gameId = new ObjectId(gameIdentifier);
+      let playerId = new ObjectId(playerIdentifier);
+      let deckId = new ObjectId();
+      let db = database.db('draft');
+
+      db.collection('decks').insertOne({
+        deckId: deckId,
+        gameId: gameId,
+        playerId: playerId,
+        dateCreated: Date.now(),
+        dateModified: Date.now(),
+        name: deck.name,
+        mainBoard: deck.mainBoard,
+        sideBoard: deck.sideBoard,
+        tabletopImages: {
+          state: 0,
+          links: []
+        }
+      }, (err) => {
+        if (err) {
+          res.status(500);
+          res.send({ status: 500 });
+        } else {
+          res.status(200);
+          res.send({
+            status: 200,
+            data: {
+              gameId: gameId,
+              playerId: playerId,
+              deckId: deckId
+            }
+          });
+        }
+        database.close();
+      });
+    }
+  });
+}
+
+function updateDeck(deckId, deckModifier, callback, errCallback) {
+  getDeck(deckId, (deck) => {
+    MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
+      if (err) {
+        errCallback();
+      } else {
+        const db = database.db('draft');
+
+        deckModifier(deck);
+        db.collection('decks').update({ deckId: new ObjectId(deckId) }, deck, () => {
+          database.close();
+          callback();
+        });
+      }
+    });
+  }, errCallback)
+}
+
 // Create game
 router.post('/game', (req, res) => {
   handleQueue(() => {
@@ -508,6 +638,7 @@ router.get('/game/:gameId/player/:playerId/cards/tabletop', (req, res) => {
           match.tabletopImages.state = 1;
         }, queueFuncComplete);
       });
+      res.status(200);
       res.send({ status: 200, state: tabletopStateMap[1], isProcessing: true });
 
       handleTabletopQueue(() => {
@@ -518,7 +649,7 @@ router.get('/game/:gameId/player/:playerId/cards/tabletop', (req, res) => {
         });
         TabletopGenerator.generateTabletopImages(
           player.cards,
-          req.query.addLand,
+          true,
           (links, error) => {
             handleQueue(() => {
               updatePlayer(player.id, code, (match) => {
@@ -534,8 +665,10 @@ router.get('/game/:gameId/player/:playerId/cards/tabletop', (req, res) => {
         });
       });
     } else if (player.tabletopImages.state < 3) {
+      res.status(200);
       res.send({ status: 200, state: tabletopStateMap[player.tabletopImages.state], isProcessing: true });
     } else {
+      res.status(200);
       res.send( {
         status: 200,
         state: tabletopStateMap[player.tabletopImages.state],
@@ -545,11 +678,12 @@ router.get('/game/:gameId/player/:playerId/cards/tabletop', (req, res) => {
           'Cards from a recent draft',
           player.cards,
           player.tabletopImages.links,
-          req.query.addLand
+          true
         )
       });
     }
   }, (errResponse) => {
+    res.status(errResponse.status);
     res.send(errResponse);
   });
 });
@@ -561,8 +695,116 @@ router.get('/game/:gameId/player/:playerId', (req, res) => {
   }, res);
 });
 
+// Get decklist
+router.get('/player/:playerId/game/:gameId/decklist', (req, res) => {
+  getDeckList(req.params.playerId, req.params.gameId, res);
+});
+
+// Get deck
+router.get('/player/:playerId/game/:gameId/deck/:deckId', (req, res) => {
+  getDeck(req.params.deckId, (deck) => {
+    res.status(200);
+    res.send({ data: deck });
+  }, (err) => {
+    res.status(err.status);
+    res.send(err);
+  });
+});
+
+// Create deck
+router.post('/player/:playerId/game/:gameId/deck', (req, res) => {
+  createDeck(req.params.playerId, req.params.gameId, req.body, res);
+});
+
+// Update deck
+router.put('/player/:playerId/game/:gameId/deck/:deckId', (req, res) => {
+  const deckId = req.params.deckId;
+  const gameId = req.params.gameId;
+  const playerId = req.params.playerId;
+  const deck = req.body;
+  updateDeck(deckId, (dbDeck) => {
+    dbDeck.dateModified = Date.now();
+    dbDeck.name = deck.name;
+    dbDeck.mainBoard = deck.mainBoard;
+    dbDeck.sideBoard = deck.sideBoard;
+    dbDeck.tabletopImages = {
+      state: 0,
+      links: []
+    };
+  }, () => {
+    res.status(200);
+    res.send({
+      status: 200,
+      data: {
+        gameId: gameId,
+        playerId: playerId,
+        deckId: deckId
+      }
+    });
+  }, (err) => {
+    res.status(err.status || 500);
+    res.send(err);
+  });
+});
+
+// Tabletop deck
+router.get('/game/:gameId/player/:playerId/deck/:deckId/tabletop', (req, res) => {
+  let deckId = req.params.deckId;
+  getDeck(deckId, (deck) => {
+    if (deck.tabletopImages.state < 1) {
+      updateDeck(deckId, (match) => {
+        match.tabletopImages.state = 1;
+      }, () => {});
+      res.status(200);
+      res.send({ status: 200, state: tabletopStateMap[1], isProcessing: true });
+
+      handleTabletopQueue(() => {
+        updateDeck(deckId, (match) => {
+          match.tabletopImages.state = 2;
+        }, () => {
+          TabletopGenerator.generateTabletopImages(
+            deck.mainBoard,
+            false,
+            (links, error) => {
+              updateDeck(deckId, (match) => {
+                if (error) {
+                  match.tabletopImages.state = -1;
+                } else {
+                  match.tabletopImages.links = links;
+                  match.tabletopImages.state = 3;
+                }
+              }, () => {});
+              tabletopQueueFuncComplete()
+          });
+        });
+      });
+    } else if (deck.tabletopImages.state < 3) {
+      res.status(200);
+      res.send({ status: 200, state: tabletopStateMap[deck.tabletopImages.state], isProcessing: true });
+    } else {
+      res.status(200);
+      res.send({
+        status: 200,
+        state: tabletopStateMap[deck.tabletopImages.state],
+        isProcessing: false,
+        data: TabletopGenerator.getTabletopJson(
+          deck.name,
+          'A deck from a recent draft',
+          deck.mainBoard,
+          deck.tabletopImages.links,
+          false
+        )
+      });
+    }
+  }, (errResponse) => {
+    res.status(errResponse.status);
+    res.send(errResponse);
+  });
+});
+
 // Home to test that we're running
 router.get('/', (req, res) => {
+  res.status(200);
   res.send({status: 200, message: 'banana'});
 });
 

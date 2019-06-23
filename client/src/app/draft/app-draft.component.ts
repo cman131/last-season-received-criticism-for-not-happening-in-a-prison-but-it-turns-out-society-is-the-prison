@@ -13,7 +13,8 @@ import { ScryfallService } from '../shared/scryfall.service';
 })
 export class AppDraftComponent implements OnInit, OnDestroy {
   public backupImg =
-  'https://c-4tvylwolbz88x24nhtlwlkphx2ejbyzljkux2ejvt.g00.gamepedia.com/g00/3_c-4tan.nhtlwlkph.jvt_/c-4TVYLWOLBZ88x24oaawzx3ax2fx2fnhtlwlkph.jbyzljku.jvtx2ftanzhschapvu_nhtlwlkphx2fmx2fm5x2fThnpj_jhyk_ihjr.qwnx3fclyzpvux3d7kkj5k18j0i36j9j0j1ii2k49336mmk4_$/$/$/$/$?i10c.ua=1&i10c.dv=15'
+  // tslint:disable-next-line:max-line-length
+  'https://c-4tvylwolbz88x24nhtlwlkphx2ejbyzljkux2ejvt.g00.gamepedia.com/g00/3_c-4tan.nhtlwlkph.jvt_/c-4TVYLWOLBZ88x24oaawzx3ax2fx2fnhtlwlkph.jbyzljku.jvtx2ftanzhschapvu_nhtlwlkphx2fmx2fm5x2fThnpj_jhyk_ihjr.qwnx3fclyzpvux3d7kkj5k18j0i36j9j0j1ii2k49336mmk4_$/$/$/$/$?i10c.ua=1&i10c.dv=15';
 
   public gameConfig: GameConfig = {
     code: '',

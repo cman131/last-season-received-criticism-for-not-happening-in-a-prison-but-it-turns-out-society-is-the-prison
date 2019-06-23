@@ -4,6 +4,12 @@
   display: flex;
 }
 
+.collection-pane {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
 ul {
   list-style: none;
 }
@@ -16,9 +22,10 @@ ul {
   -webkit-user-select: none;
 }
 
-.preview-pane {
+.filter-pane {
   display: inline-block;
   width: 300px;
+  max-height: 1000px;
   padding: 5px;
 }
 
@@ -51,20 +58,14 @@ ul {
   font-style: italic;
 }
 
-.chevron {
-  padding-left: 2px;
-  cursor: pointer;
-}
-
 .player-list {
   margin-top: 0;
   width: 185px;
-  height: 70px;
   background-color: white;
-  border: 1px solid black;
-  overflow-y: auto;
   padding-left: 0px;
   padding-right: 0px;
+  border: 1px solid black;
+  overflow-y: auto;
 }
 
 .player-list li {
@@ -72,40 +73,20 @@ ul {
   padding-right: 20px;
 }
 
-.active-player {
-  background-color: rgba(128, 128, 128, 0.726);
+.deck-management-options {
+  display: flex;
+  flex-direction: column;
+}
+.deck-management-options button {
+  margin-top: 10px;
 }
 
-#draft-main {
+#collection-main {
   display: inline-block;
-  width: 100%;
+  min-width: 1111px;
+  max-height: 1000px;
   padding: 5px;
   border-left: 4px solid gray;
-}
-
-.draft-nav-pane {
-  display: flex;
-  padding-left: 5px;
-  padding-right: 5px;
-  max-height: 50px;
-}
-
-.draft-left-player {
-  flex: 1;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.draft-direction {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.draft-right-player {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
 }
 
 .card-pane {
@@ -115,7 +96,7 @@ ul {
   flex-wrap: wrap;
   align-content: flex-start;
   margin-bottom: 10px;
-  height: 700px;
+  height: 340px;
   padding: 15px;
   padding-top: 5px;
   padding-bottom: 5px;
@@ -123,41 +104,47 @@ ul {
   position: relative;
 }
 
-.card {
-  width: 110.88px;
-  height: 154.44px;
-  flex: 0 0 100.8px;
-  margin: 5px;
+.deck-pane {
+  border: 1px solid gray;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  margin-bottom: 10px;
+  height: 340px;
+  padding: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: auto;
+  position: relative;
+}
+
+.deck-bar {
+  position: relative;
 }
 
 .card-count {
   position: absolute;
+  top: 60px;
+  right: 25px;
   z-index: 20;
-  top: 0;
-  right: 15px;
+  margin: 0;
   padding: 10px;
   border: 1px solid black;
   background-color: white;
 }
 
-.picked-cards {
-  background-color: rgb(28, 95, 28);
-}
-
 .ripple-pane {
-  border: 1px solid gray;
-  border-radius: 5px;
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10px;
-  height: 700px;
+  height: 100%;
+  width: 100%;
   padding: 15px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  overflow-y: auto;
+  padding-top: 304px;
+  overflow-y: hidden;
 }
 
 .lds-ripple {

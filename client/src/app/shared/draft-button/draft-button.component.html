@@ -1,0 +1,12 @@
+<button
+  class="btn"
+  routerLinkActive="active"
+  [disabled]="disabled"
+  [ngClass]="{
+    'btn-primary': isPrimary
+  }"
+  [routerLink]="routerLink"
+  (click)="clicked.emit()"
+>
+  <ng-content></ng-content>
+</button>

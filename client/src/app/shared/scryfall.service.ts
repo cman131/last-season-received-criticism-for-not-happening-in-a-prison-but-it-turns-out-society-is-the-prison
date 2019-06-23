@@ -7,6 +7,14 @@ import { Card } from './types/card';
 
 @Injectable()
 export class ScryfallService {
+  private colorMap = {
+    W: 'white',
+    U: 'blue',
+    B: 'black',
+    R: 'red',
+    G: 'green'
+  };
+
   private acceptableSetTypes = [
     'core',
     'expansion',
@@ -37,7 +45,9 @@ export class ScryfallService {
           id: card.id,
           name: card.name,
           description: description,
-          imageUrl: card.image_uris.large
+          imageUrl: card.image_uris.large,
+          cmc: card.cmc,
+          colors: card.colors.map(item => this.colorMap[item])
         };
       });
     }));

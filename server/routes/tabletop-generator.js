@@ -7,27 +7,32 @@ const lands = [
   {
     name: 'Forest',
     description: '({T}: Add {G}.)',
-    imageUrl: 'https://img.scryfall.com/cards/large/front/5/8/58fe058d-7796-4233-8d74-2a12f9bd0023.jpg?1543675077'
+    imageUrl: 'https://img.scryfall.com/cards/large/front/5/8/58fe058d-7796-4233-8d74-2a12f9bd0023.jpg?1543675077',
+    count: 1
   },
   {
     name: 'Island',
     description: '({T}: Add {U}.)',
-    imageUrl: 'https://img.scryfall.com/cards/large/front/0/b/0ba8851d-0b25-4232-acd3-594b5b25f16e.jpg?1543675020'
+    imageUrl: 'https://img.scryfall.com/cards/large/front/0/b/0ba8851d-0b25-4232-acd3-594b5b25f16e.jpg?1543675020',
+    count: 1
   },
   {
     name: 'Mountain',
     description: '({T}: Add {R}.)',
-    imageUrl: 'https://img.scryfall.com/cards/large/front/4/9/49ac3fd1-f732-4d96-ac93-560e4e86051e.jpg?1543675054'
+    imageUrl: 'https://img.scryfall.com/cards/large/front/4/9/49ac3fd1-f732-4d96-ac93-560e4e86051e.jpg?1543675054',
+    count: 1
   },
   {
     name: 'Swamp',
     description: '({T}: Add {B}.)',
-    imageUrl: 'https://img.scryfall.com/cards/large/front/8/b/8bc682cd-b13b-4670-913c-70542f161316.jpg?1543675036'
+    imageUrl: 'https://img.scryfall.com/cards/large/front/8/b/8bc682cd-b13b-4670-913c-70542f161316.jpg?1543675036',
+    count: 1
   },
   {
     name: 'Plains',
     description: '({T}: Add {W}.)',
-    imageUrl: 'https://img.scryfall.com/cards/large/front/f/e/feada93b-aabf-45d6-ac46-98b33caf9112.jpg?1543675002'
+    imageUrl: 'https://img.scryfall.com/cards/large/front/f/e/feada93b-aabf-45d6-ac46-98b33caf9112.jpg?1543675002',
+    count: 1
   }
 ];
 
@@ -36,9 +41,10 @@ function reduce(array) {
   for (let item of array) {
     if (!(item.name in tempDict)) {
       tempDict[item.name] = item;
-      tempDict[item.name].count = 0;
+      tempDict[item.name].count = item.count ? item.count : 1;
+    } else {
+      tempDict[item.name].count += item.count ? item.count : 1;
     }
-    tempDict[item.name].count += 1;
   }
   return Object.values(tempDict);
 }
@@ -63,7 +69,7 @@ function errorCallback(callback) {
 
 async function generateTabletopImages(cards, addLand, callback) {
   try {
-    if (addLand !== false) {
+    if (addLand) {
       cards = cards.concat(lands);
     }
 

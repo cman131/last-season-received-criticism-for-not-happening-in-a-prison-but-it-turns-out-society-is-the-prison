@@ -1,0 +1,15 @@
+<p *ngIf="card.count > 1"
+  class="card-count no-select"
+>
+  {{ card.count }}
+</p>
+<img
+  class="card"
+  [ngClass]="{
+    'empty': empty
+  }"
+  [src]="card.imageUrl"
+  [title]="card.name"
+  (mouseenter)="selected.emit(card)"
+  (click)="click()"
+/>
