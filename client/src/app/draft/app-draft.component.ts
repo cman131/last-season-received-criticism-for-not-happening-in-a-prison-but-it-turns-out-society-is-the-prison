@@ -4,7 +4,6 @@ import { GameConfig } from '../shared/types/game-config';
 import { GameService } from '../shared/game.service';
 import { take } from 'rxjs/operators';
 import { Card } from '../shared/types/card';
-import { ScryfallService } from '../shared/scryfall.service';
 
 @Component({
   selector: 'app-draft',
@@ -55,8 +54,7 @@ export class AppDraftComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private gameService: GameService,
-    private scryfall: ScryfallService
+    private gameService: GameService
   ) { }
 
   public ngOnInit() {
@@ -72,7 +70,7 @@ export class AppDraftComponent implements OnInit, OnDestroy {
         && this.gameConfig.currentPack !== config.currentPack
         && config.currentPack.length > 0
       ) {
-        this.scryfall.getCards(config.currentPack).pipe(take(1)).subscribe(cards => this.currentPack = cards);
+        this.currentPack = config.currentPack;
       } else if ( config && config.currentPack && config.currentPack.length === 0) {
         this.currentPack = [];
       }

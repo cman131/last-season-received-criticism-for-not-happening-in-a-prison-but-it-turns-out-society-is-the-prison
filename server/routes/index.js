@@ -5,8 +5,8 @@ const ObjectId = require('mongodb').ObjectID;
 const config = require('../config');
 const request = require('request');
 
-const Jimp = require('jimp');
 const TabletopGenerator = require('./tabletop-generator');
+const BoosterGenerator = require('./booster-generation/generic-booster');
 
 let baseBoosterUrl = 'https://api.magicthegathering.io/v1/sets/{0}/booster';
 
@@ -291,20 +291,9 @@ function getGameConfig(code, playerId, res) {
 
 function populatePacks(code, playerId, sets) {
   let boosters = [];
-  let boosterFulfillment = (data, set) => {
-    if (!data || !data.cards || data.cards.filter(item => landNames.includes(item.name.toLowerCase())).length > 1) {
-      getNewPack(set, boosterFulfillment);
-      return;
-    }
-
-    boosters.push(data.cards.map(item => {
-      let name = item.name;
-      if (item.names && item.names.length > 1) {
-        name = item.names.join(' // ');
-      }
-      return name.replace(/ \([a-z]\)/, '');
-    }));
-    if (boosters.length === 3 && boosters[0].length === boosters[1].length && boosters[1].length === boosters[2].length) {
+  let boosterFulfillment = (data) => {
+    boosters = boosters.concat(data);
+    if (boosters.length === 3) {
       handleQueue(() => {
         MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
           if (err) {
@@ -337,27 +326,20 @@ function populatePacks(code, playerId, sets) {
           });
         });
       })
-    } else if (boosters.length === 3) {
-      populatePacks(code, playerId, sets);
     }
   };
 
+  let setMap = {};
   for (let set of sets) {
-    getNewPack(set, boosterFulfillment);
-  }
-}
-
-function getNewPack(set, callback) {
-  request.get({
-    url: baseBoosterUrl.replace('{0}', set),
-    json: true,
-    headers: { 'User-Agent': 'request' }
-  }, (err, response, data) => {
-    if (err) {
-      throw err;
+    if (set in setMap) {
+      setMap[set] += 1;
+    } else {
+      setMap[set] = 1;
     }
-    callback(data, set);
-  });
+  }
+  for (let set in setMap) {
+    BoosterGenerator.generatePacks(request, set, setMap[set], boosterFulfillment);
+  }
 }
 
 function pickACard(playerId, card, game) {

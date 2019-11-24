@@ -19,8 +19,7 @@ export class ScryfallService {
     'core',
     'expansion',
     'masters',
-    'draft_innovation',
-    'funny'
+    'draft_innovation'
   ];
 
   constructor(

@@ -10,7 +10,7 @@ export interface GameConfig {
   players?: string[];
   packsReady?: boolean;
   cards?: Card[];
-  currentPack?: string[];
+  currentPack?: Card[];
   state?: number;
   done?: boolean;
 }
