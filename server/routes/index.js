@@ -343,12 +343,12 @@ function pickACard(playerId, card, game) {
   let player = game.players.filter(plyr => plyr.id.toString() === playerId.toString())[0];
 
   // fucked up with an additional request
-  if (player.currentPack.filter(item => item === card.name).length === 0) {
+  if (player.currentPack.filter(item => item.name === card.name).length === 0) {
     return game;
   }
 
   player.cards.push(card);
-  player.currentPack = removeFirst(player.currentPack, (item) => item === card.name);
+  player.currentPack = removeFirst(player.currentPack, (item) => item.name === card.name);
 
   let nextPlayerIndex;
   if (player.backupPacks.length === 1) {
