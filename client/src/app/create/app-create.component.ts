@@ -16,7 +16,7 @@ export class AppCreateComponent {
   public game: GameConfig = {
     name: '',
     maxPlayers: 8,
-    sets: ['grn']
+    sets: []
   };
   public sets: Set[] = [];
   public errorMessage: string;
@@ -28,6 +28,7 @@ export class AppCreateComponent {
   ) {
     this.scryfall.getSets().pipe(take(1)).subscribe((sets: Set[]) => {
       this.sets = sets;
+      this.game.sets = [sets[0].code];
     });
   }
 
