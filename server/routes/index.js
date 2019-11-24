@@ -6,9 +6,7 @@ const config = require('../config');
 const request = require('request');
 
 const TabletopGenerator = require('./tabletop-generator');
-const BoosterGenerator = require('./booster-generation/generic-booster');
-
-let baseBoosterUrl = 'https://api.magicthegathering.io/v1/sets/{0}/booster';
+const BoosterGenerator = require('./booster-generation/booster-generator');
 
 const requestQueue = [];
 const tabletopRequestQueue = [];
@@ -16,7 +14,6 @@ let lock = false;
 let tabletopLock = false;
 
 const tabletopStateMap = ['Errored/NotStarted', 'Queued', 'Processing', 'Complete'];
-const landNames = ['swamp', 'forest', 'island', 'mountain', 'plains'];
 
 let tabletopQueueFuncComplete = () => {
   tabletopLock = false;

@@ -2,6 +2,10 @@ function getRandomIndex(length = 0) {
   return Math.floor(Math.random() * length);
 }
 
+const specialSets = [
+  'grn',
+  'rna'
+]
 const lands = [
   {
     id: '58fe058d-7796-4233-8d74-2a12f9bd0023',
@@ -78,31 +82,35 @@ function mapCard(card) {
   };
 }
 
-function makePacks(cards, count, callback) {
-  const commons = cards.filter(card => card.rarity === 'common');
-  const uncommons = cards.filter(card => card.rarity === 'uncommon');
-  let rares = cards.filter(card => card.rarity === 'rare');
-  rares = rares.concat(rares);
-  rares.concat(cards.filter(card => card.rarity === 'mythic'));
+function makePacks(cards, set, count, callback) {
+  let boosters = [];
+  if (specialSets.includes(set.toLowerCase())) {
+    const setGenerator = require('./sets/' + set.toLowerCase());
+    boosters = setGenerator.generatePacks(cards, count, lands, mapCard);
+  } else {
+    const commons = cards.filter(card => card.rarity === 'common');
+    const uncommons = cards.filter(card => card.rarity === 'uncommon');
+    let rares = cards.filter(card => card.rarity === 'rare');
+    rares = rares.concat(rares);
+    rares.concat(cards.filter(card => card.rarity === 'mythic'));
 
-  const boosters = [];
-  while(boosters.length < count) {
-    let booster = [];
-    for(let i = 0; i < 10; i++) {
-      booster.push(commons[getRandomIndex(commons.length)]);
+    while(boosters.length < count) {
+      let booster = [];
+      for(let i = 0; i < 10; i++) {
+        booster.push(commons[getRandomIndex(commons.length)]);
+      }
+      for(let i = 0; i < 3; i++) {
+        booster.push(uncommons[getRandomIndex(uncommons.length)]);
+      }
+      booster.push(rares[getRandomIndex(rares.length)]);
+      booster.push(lands[getRandomIndex(lands.length)]);
+      boosters.push(booster.map(mapCard));
     }
-    for(let i = 0; i < 3; i++) {
-      booster.push(uncommons[getRandomIndex(uncommons.length)]);
-    }
-    booster.push(rares[getRandomIndex(rares.length)]);
-    booster.push(lands[getRandomIndex(lands.length)]);
-    boosters.push(booster.map(mapCard));
   }
-
   callback(boosters);
 }
 
-function cardGrabber(request, url, count, callback, cards) {
+function cardGrabber(request, url, set, count, callback, cards) {
   request.get({
     url: url,
     json: true,
@@ -113,9 +121,9 @@ function cardGrabber(request, url, count, callback, cards) {
     }
     const newCards = cards.concat(data.data);
     if (data.has_more) {
-      cardGrabber(request, data.next_page, count, callback, newCards)
+      cardGrabber(request, data.next_page, set, count, callback, newCards)
     } else {
-      makePacks(newCards, count, callback);
+      makePacks(newCards, set, count, callback);
     }
   });
 }
@@ -124,6 +132,7 @@ function generatePacks(request, setCode, count , callback) {
   cardGrabber(
     request,
     baseBoosterUrl.replace('{0}', setCode),
+    setCode,
     count,
     callback,
     []
