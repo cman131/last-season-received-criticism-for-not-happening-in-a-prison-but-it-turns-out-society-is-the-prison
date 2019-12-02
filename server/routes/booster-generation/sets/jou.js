@@ -14,3 +14,5 @@ function generatePacks(cards, count, lands, mapCard){
     booster.push(lands[getRandomIndex(lands.length)])
     return list_of_JOU_gods;
 }
+
+exports.generatePacks = generatePacks; 
