@@ -4,7 +4,9 @@ function getRandomIndex(length = 0) {
 
 const specialSets = [
   'grn',
-  'rna'
+  'rna',
+  'dgm',
+  'frf'
 ]
 const lands = [
   {
@@ -96,13 +98,22 @@ function makePacks(cards, set, count, callback) {
 
     while(boosters.length < count) {
       let booster = [];
-      for(let i = 0; i < 10; i++) {
+      const isFoil = getRandomIndex(6) === 2;
+      for(let i = 0; i < (isFoil ? 10 : 11); i++) {
         booster.push(commons[getRandomIndex(commons.length)]);
       }
       for(let i = 0; i < 3; i++) {
         booster.push(uncommons[getRandomIndex(uncommons.length)]);
       }
       booster.push(rares[getRandomIndex(rares.length)]);
+
+      if (isFoil) {
+        booster.push({
+          ...cards[getRandomIndex(cards.length)],
+          isFoil: true
+        });
+      }
+
       booster.push(lands[getRandomIndex(lands.length)]);
       boosters.push(booster.map(mapCard));
     }

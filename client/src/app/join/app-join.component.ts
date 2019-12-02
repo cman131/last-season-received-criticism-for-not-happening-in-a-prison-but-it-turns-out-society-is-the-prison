@@ -24,7 +24,6 @@ export class AppJoinComponent {
   public submit(): void {
     // submit the thing and validate
     this.managementService.joinGame(this.game).subscribe((connection: GameConnection) => {
-      console.log(connection);
       if (connection.success) {
         this.router.navigate(['/draft', connection.code, connection.playerId]);
       } else {
