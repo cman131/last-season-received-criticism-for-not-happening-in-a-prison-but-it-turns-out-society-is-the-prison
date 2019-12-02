@@ -4,7 +4,8 @@ function getRandomIndex(length = 0) {
 
 const specialSets = [
   'grn',
-  'rna'
+  'rna',
+  'jou'
 ]
 const lands = [
   {
