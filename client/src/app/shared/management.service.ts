@@ -35,7 +35,6 @@ export class ManagementService {
     }).pipe(
       take(1),
       map((response: any) => {
-        console.log(response);
         const data = response.data || {};
         return {
           code: data.code,
