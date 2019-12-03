@@ -783,19 +783,20 @@ router.get('/game/:gameId/player/:playerId/deck/:deckId/tabletop', (req, res) =>
 
 router.get('/testpack/:setId/:count', (req, res) => {
   try {
-    if (!req.params.setId) {
+    if (!req.params.setId || req.params.setId.length !== 3) {
       res.status(400);
-      res.send({ message: 'No. Bad input, bruh.' });
-    }
-    let count = 1;
-    if (req.params.count) {
-      count = parseInt(req.params.count);
-    }
+      res.send({ message: 'No. Bad input, bruh.', setId: req.params.setId });
+    } else {
+      let count = 1;
+      if (req.params.count) {
+        count = parseInt(req.params.count);
+      }
 
-    BoosterGenerator.generatePacks(request, req.params.setId, count, (packs) => {
-      res.status(200);
-      res.send({ data: packs.map(pack => pack.map(card => card.name)) });
-    });
+      BoosterGenerator.generatePacks(request, req.params.setId, count, (packs) => {
+        res.status(200);
+        res.send({ data: packs.map(pack => pack.map(card => card.name)) });
+      });
+    }
   } catch(e) {
     console.log(e);
     throw e;
