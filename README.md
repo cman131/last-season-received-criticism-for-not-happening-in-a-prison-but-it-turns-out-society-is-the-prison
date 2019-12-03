@@ -1,27 +1,34 @@
 # DraftApp
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.3.
+The client was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.3.
+The server is a node express application.
 
-## Development server
+## Local Development Setup
+Install all dependencies:
+```
+cd Server
+npm install
+cd ../client
+npm install
+cd ..
+```
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Create the config.json file in the Server folder:
+```
+cd Server
+cp config.json.template config.json
+vim config.json
+cd ..
+```
+the imgur key is only necessary for generating tabletop images. All you really need is the Mongodb uri.
 
-## Code scaffolding
+Now you can navigate into the Server and Client folders respectively and execute `npm run start` to being running the server.
+```
+cd Server
+npm run start
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+cd client
+npm run start
+```
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Then navigate to http://localhost:4200 in a brower and you should be able to use the application.
