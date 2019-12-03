@@ -5,6 +5,7 @@ function getRandomIndex(length = 0) {
 const specialSets = [
   'grn',
   'rna',
+  'jou',
   'dgm',
   'frf'
 ]
