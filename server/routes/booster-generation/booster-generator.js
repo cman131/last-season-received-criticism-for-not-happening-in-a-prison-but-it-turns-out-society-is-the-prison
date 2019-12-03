@@ -11,8 +11,10 @@ const specialSets = [
   'ice',
   'all',
   'mh1',
-  'csp'
+  'csp',
+  'ogw'
 ]
+
 const lands = [
   {
     id: '58fe058d-7796-4233-8d74-2a12f9bd0023',
@@ -65,8 +67,9 @@ const lands = [
     }
   }
 ];
-const baseBoosterPart1 = 'https://api.scryfall.com/cards/search?order=set&q=set%3A';
-const baseBoosterPart2 = '+unique%3Acards+is%3Abooster+-type%3Abasic&unique=cards&is=booster';
+
+const baseBoosterUrl = 'https://api.scryfall.com/cards/search?order=set&q=set%3A{0}+unique%3Acards+is%3Abooster+-type%3Abasic&unique=cards&is=booster';
+
 const colorMap = {
   W: 'white',
   U: 'blue',
@@ -153,7 +156,7 @@ function cardGrabber(request, url, set, count, callback, cards, retryCount = 0) 
 function generatePacks(request, setCode, count , callback) {
   cardGrabber(
     request,
-    baseBoosterPart1 + setCode + baseBoosterPart2,
+    baseBoosterUrl.replace('{0}', setCode),
     setCode,
     count,
     callback,
