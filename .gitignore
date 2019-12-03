@@ -64,3 +64,4 @@ typings/
 package-lock.json
 dist/
 config.json
+server/app.js
