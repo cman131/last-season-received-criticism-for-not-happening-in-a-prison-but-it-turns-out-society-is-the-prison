@@ -12,7 +12,11 @@ const specialSets = [
   'all',
   'mh1',
   'csp',
-  'ogw'
+  'ogw',
+  'isd',
+  'dka',
+  'soi',
+  'emn'
 ]
 
 const lands = [
@@ -80,16 +84,18 @@ const colorMap = {
 
 function mapCard(card) {
   let description = card.oracle_text;
+
   if (card.card_faces) {
     description = card.card_faces.map(cardFace => cardFace.name + ' - ' + cardFace.oracle_text).join('<br/>');
   }
+
   return {
     id: card.id,
     name: card.name,
     description: description,
-    imageUrl: card.image_uris.large,
+    imageUrl: card.image_uris ? card.image_uris.large : card.card_faces[0].image_uris.large,
     cmc: card.cmc,
-    colors: card.colors.map(item => colorMap[item])
+    colors: (card.colors ? card.colors : card.card_faces[0].colors).map(item => colorMap[item])
   };
 }
 
