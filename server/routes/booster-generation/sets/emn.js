@@ -1,6 +1,6 @@
-function generatePacks(cards, count, lands, mapCard) {
+function generatePacks(cards, count, lands) {
     const shadowsSetGenerator = require('./soi');
-    return shadowsSetGenerator.generatePacks(cards, count, lands, mapCard);
+    return shadowsSetGenerator.generatePacks(cards, count, lands);
 }
 
 exports.generatePacks = generatePacks;

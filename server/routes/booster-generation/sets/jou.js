@@ -1,3 +1,5 @@
+const Utility = require('../utility');
+
 const godPack  = 
 [
   {
@@ -194,65 +196,24 @@ const godPack  =
 
 const godPackRatio = 1080;
 
-function getRandomIndex(length = 0) 
-{
-  return Math.floor(Math.random() * length);
-}
-
-function generatePacks(cards, count, lands, mapCard)
+function generatePacks(cards, count, lands)
 {
   const boosters = [];
-  const commons = cards.filter(card => card.rarity === 'common');
-  const uncommons = cards.filter(card => card.rarity === 'uncommon');
-  let rares = cards.filter(card => card.rarity === 'rare');
-  rares = rares.concat(rares);
-  rares.concat(cards.filter(card => card.rarity === 'mythic'));
-
+  const prePacks = Utility.makeGenericPacks(cards, count, lands);
   while( boosters.length < count )
   {
-    if( getRandomIndex(godPackRatio) === 540 )
+    if(Utility.getRandomIndex(godPackRatio) === 540)
     {
-      //create a god pack
+      // Create a god pack
       const booster = [...godPack];
-      //put the land in 
-      booster.push(lands[getRandomIndex(lands.length)]);
-      //Unpackages the card
-      boosters.push(booster.map(mapCard));
+      // Put the land in 
+      booster.push(Utility.getRandomCard(lands, booster, false));
+      // Unpackages the card
+      boosters.push(booster.map(Utility.mapCard));
     }
     else
     {
-      let booster = [];
-      //create a boolean to indicate if we have a foil
-      const isFoil = getRandomIndex(6) === 2;
-
-      //populate the commons
-      for(let i = 0; i < (isFoil ? 10 : 11); i++) 
-      {
-        booster.push(commons[getRandomIndex(commons.length)]);
-      }
-
-      //populate the uncommons
-      for(let i = 0; i < 3; i++) 
-      {
-        booster.push(uncommons[getRandomIndex(uncommons.length)]);
-      }
-
-      //populate the rares and mythics
-      booster.push(rares[getRandomIndex(rares.length)]);
-
-      //fill in the foil cards
-      if (isFoil) 
-      {
-        booster.push(
-        {
-          ...cards[getRandomIndex(cards.length)],
-          isFoil: true
-        });
-      }
-      //put the land in 
-      booster.push(lands[getRandomIndex(lands.length)]);
-      //Unpackages the card
-      boosters.push(booster.map(mapCard));
+      boosters.push(prePacks.pop());
     }
   }
   return boosters;

@@ -1,6 +1,4 @@
-function getRandomIndex(length = 0) {
-  return Math.floor(Math.random() * length);
-}
+const Utility = require('./utility');
 
 const specialSets = [
   'grn',
@@ -74,64 +72,13 @@ const lands = [
 
 const baseBoosterUrl = 'https://api.scryfall.com/cards/search?order=set&q=set%3A{0}+unique%3Acards+is%3Abooster+-type%3Abasic&unique=cards&is=booster';
 
-const colorMap = {
-  W: 'white',
-  U: 'blue',
-  B: 'black',
-  R: 'red',
-  G: 'green'
-};
-
-function mapCard(card) {
-  let description = card.oracle_text;
-
-  if (card.card_faces) {
-    description = card.card_faces.map(cardFace => cardFace.name + ' - ' + cardFace.oracle_text).join('<br/>');
-  }
-
-  return {
-    id: card.id,
-    name: card.name,
-    description: description,
-    imageUrl: card.image_uris ? card.image_uris.large : card.card_faces[0].image_uris.large,
-    cmc: card.cmc,
-    colors: (card.colors ? card.colors : card.card_faces[0].colors).map(item => colorMap[item])
-  };
-}
-
 function makePacks(cards, set, count, callback) {
   let boosters = [];
   if (specialSets.includes(set.toLowerCase())) {
     const setGenerator = require('./sets/' + set.toLowerCase());
-    boosters = setGenerator.generatePacks(cards, count, lands, mapCard);
+    boosters = setGenerator.generatePacks(cards, count, lands);
   } else {
-    const commons = cards.filter(card => card.rarity === 'common');
-    const uncommons = cards.filter(card => card.rarity === 'uncommon');
-    let rares = cards.filter(card => card.rarity === 'rare');
-    rares = rares.concat(rares);
-    rares.concat(cards.filter(card => card.rarity === 'mythic'));
-
-    while(boosters.length < count) {
-      let booster = [];
-      const isFoil = getRandomIndex(6) === 2;
-      for(let i = 0; i < (isFoil ? 10 : 11); i++) {
-        booster.push(commons[getRandomIndex(commons.length)]);
-      }
-      for(let i = 0; i < 3; i++) {
-        booster.push(uncommons[getRandomIndex(uncommons.length)]);
-      }
-      booster.push(rares[getRandomIndex(rares.length)]);
-
-      if (isFoil) {
-        booster.push({
-          ...cards[getRandomIndex(cards.length)],
-          isFoil: true
-        });
-      }
-
-      booster.push(lands[getRandomIndex(lands.length)]);
-      boosters.push(booster.map(mapCard));
-    }
+    boosters = Utility.makeGenericPacks(cards, count, lands);
   }
   callback(boosters);
 }

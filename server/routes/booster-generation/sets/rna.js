@@ -1,9 +1,8 @@
-const guildGates = ['Azorius Guildgate', 'Gruul Guildgate', 'Orzhov Guildgate', 'Rakdos Guildgate', 'Simic Guildgate'];
-function getRandomIndex(length = 0) {
-  return Math.floor(Math.random() * length);
-}
+const Utility = require('../utility');
 
-function generatePacks(cards, count, _, mapCard) {
+const guildGates = ['Azorius Guildgate', 'Gruul Guildgate', 'Orzhov Guildgate', 'Rakdos Guildgate', 'Simic Guildgate'];
+
+function generatePacks(cards, count, _) {
   const boosters = [];
 
   let commons = cards.filter(card => card.rarity === 'common');
@@ -18,25 +17,25 @@ function generatePacks(cards, count, _, mapCard) {
 
   while(boosters.length < count) {
     let booster = [];
-    const isFoil = getRandomIndex(6) === 2;
+    const isFoil = Utility.getRandomIndex(6) === 2;
 
     for(let i = 0; i < (isFoil ? 10 : 11); i++) {
-      booster.push(commons[getRandomIndex(commons.length)]);
+      booster.push(Utility.getRandomCard(commons, booster));
     }
     for(let i = 0; i < 3; i++) {
-      booster.push(uncommons[getRandomIndex(uncommons.length)]);
+      booster.push(Utility.getRandomCard(uncommons, booster));
     }
 
-    booster.push(rares[getRandomIndex(rares.length)]);
+    booster.push(Utility.getRandomCard(rares, booster));
     if (isFoil) {
       booster.push({
-        ...cards[getRandomIndex(cards.length)],
+        ...Utility.getRandomCard(cards, booster, false),
         isFoil: true
       });
     }
-    booster.push(lands[getRandomIndex(lands.length)]);
+    booster.push(Utility.getRandomCard(lands, booster, false));
 
-    boosters.push(booster.map(mapCard));
+    boosters.push(booster.map(Utility.mapCard));
   }
   return boosters;
 }
