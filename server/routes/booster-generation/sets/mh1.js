@@ -53,7 +53,7 @@ const snowLands = [
   }
 ];
 
-function generatePacks(cards, count, _, mapCard) {
+function generatePacks(cards, count, _) {
   return Utility.makeGenericPacks(cards, count, snowLands);
 }
 

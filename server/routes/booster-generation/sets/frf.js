@@ -46,7 +46,7 @@ function generatePacks(cards, count, _) {
     }
     booster.push(Utility.getRandomCard(lands, booster, false));
 
-    boosters.push(booster.map(Utility.mapCard));
+    boosters.push(booster);
   }
   return boosters;
 }
