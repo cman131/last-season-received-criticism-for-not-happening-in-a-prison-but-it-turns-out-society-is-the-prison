@@ -1,6 +1,4 @@
-function getRandomIndex(length = 0) {
-  return Math.floor(Math.random() * length);
-}
+const Utility = require('./utility');
 
 function generatePacks(cards, count, lands, mapCard) {
   const boosters = [];
@@ -15,27 +13,27 @@ function generatePacks(cards, count, lands, mapCard) {
 
   while(boosters.length < count) {
     let booster = [];
-    const isFoil = getRandomIndex(6) === 2;
+    const isFoil = Utility.getRandomIndex(6) === 2;
 
     for(let i = 0; i < (isFoil ? 9 : 10); i++) {
-      booster.push(commons[getRandomIndex(commons.length)]);
+      booster.push(Utility.getRandomCard(commons, booster));
     }
 
     for(let i = 0; i < 3; i++) {
-      booster.push(uncommons[getRandomIndex(uncommons.length)]);
+      booster.push(Utility.getRandomCard(uncommons, booster));
     }
 
-    booster.push(rares[getRandomIndex(rares.length)]);
+    booster.push(Utility.getRandomCard(rares, booster));
     if (isFoil) {
       booster.push({
-        ...cards[getRandomIndex(cards.length)],
+        ...Utility.getRandomCard(cards, booster, false),
         isFoil: true
       });
     }
-    booster.push(transformCards[getRandomIndex(transformCards.length)]);
-    booster.push(lands[getRandomIndex(lands.length)]);
+    booster.push(Utility.getRandomCard(transformCards, booster));
+    booster.push(Utility.getRandomCard(lands, booster, false));
 
-    boosters.push(booster.map(mapCard));
+    boosters.push(booster.map(Utility.mapCard));
   }
   return boosters;
 }

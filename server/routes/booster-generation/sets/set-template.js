@@ -1,12 +1,10 @@
-function getRandomIndex(length = 0) {
-  return Math.floor(Math.random() * length);
-}
+const Utility = require('../utility');
 
 function generatePacks(cards, count, lands, mapCard) {
   const boosters = [];
   while (boosters.length < count) {
       const booster = [];
-      boosters.push(booster.map(mapCard));
+      boosters.push(booster.map(Utility.mapCard));
   }
   return boosters;
 }

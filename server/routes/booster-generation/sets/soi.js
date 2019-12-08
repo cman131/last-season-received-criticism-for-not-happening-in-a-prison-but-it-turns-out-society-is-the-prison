@@ -1,8 +1,6 @@
-function getRandomIndex(length = 0) {
-  return Math.floor(Math.random() * length);
-}
+const Utility = require('../utility');
 
-function generatePacks(cards, count, lands, mapCard) {
+function generatePacks(cards, count, lands) {
   const boosters = [];
 
   const transformCards = cards.filter(card => card.card_faces && card.card_faces.length > 1);
@@ -18,35 +16,34 @@ function generatePacks(cards, count, lands, mapCard) {
 
   while(boosters.length < count) {
     let booster = [];
-    const isFoil = getRandomIndex(6) === 2;
-    const isRareTransform = getRandomIndex(8) === 2;
+    const isFoil = Utility.getRandomIndex(6) === 2;
+    const isRareTransform = Utility.getRandomIndex(8) === 2;
 
     const commonCount = 10 + (isFoil ? -1 : 0) + (isRareTransform ? -1 : 0);
     for(let i = 0; i < commonCount; i++) {
-      booster.push(commons[getRandomIndex(commons.length)]);
+      booster.push(Utility.getRandomCard(commons, booster));
     }
 
     for(let i = 0; i < 3; i++) {
-      booster.push(uncommons[getRandomIndex(uncommons.length)]);
+      booster.push(Utility.getRandomCard(uncommons, booster));
     }
 
-    booster.push(rares[getRandomIndex(rares.length)]);
-    booster.push(nonRareTransform[getRandomIndex(nonRareTransform.length)]);
+    booster.push(Utility.getRandomCard(rares, booster));
+    booster.push(Utility.getRandomCard(nonRareTransform, booster));
 
     if (isRareTransform) {
-      booster.push(rareTransform[getRandomIndex(rareTransform.length)]);
+      booster.push(Utility.getRandomCard(rareTransform, booster));
     }
 
     if (isFoil) {
       booster.push({
-        ...cards[getRandomIndex(cards.length)],
+        ...Utility.getRandomCard(cards, booster, false),
         isFoil: true
       });
     }
 
-    booster.push(lands[getRandomIndex(lands.length)]);
-
-    boosters.push(booster.map(mapCard));
+    booster.push(Utility.getRandomCard(lands, booster, false));
+    boosters.push(booster.map(Utility.mapCard));
   }
   return boosters;
 }
