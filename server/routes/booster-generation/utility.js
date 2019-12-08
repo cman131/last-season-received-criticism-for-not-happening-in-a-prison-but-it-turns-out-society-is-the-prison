@@ -63,7 +63,7 @@ function makeGenericPacks(cards, count, lands, additionalFoilOptions = []) {
     }
 
     booster.push(getRandomCard(lands, booster, false));
-    boosters.push(booster.map(mapCard));
+    boosters.push(booster);
   }
   return boosters;
 }

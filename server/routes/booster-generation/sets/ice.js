@@ -53,7 +53,7 @@ const snowLands = [
   }
 ];
 
-function generatePacks(cards, count, baseLands, mapCard) {
+function generatePacks(cards, count, baseLands) {
   const lands = snowLands.concat(baseLands);
   return Utility.makeGenericPacks(cards, count, lands);
 }

@@ -1,21 +1,5 @@
 const Utility = require('./utility');
-
-const specialSets = [
-  'grn',
-  'rna',
-  'jou',
-  'dgm',
-  'frf',
-  'ice',
-  'all',
-  'mh1',
-  'csp',
-  'ogw',
-  'isd',
-  'dka',
-  'soi',
-  'emn'
-]
+const specialSetList = require('./sets/special-set-list').specialSetList;
 
 const lands = [
   {
@@ -74,13 +58,14 @@ const baseBoosterUrl = 'https://api.scryfall.com/cards/search?order=set&q=set%3A
 
 function makePacks(cards, set, count, callback) {
   let boosters = [];
-  if (specialSets.includes(set.toLowerCase())) {
+  if (specialSetList.includes(set.toLowerCase())) {
     const setGenerator = require('./sets/' + set.toLowerCase());
     boosters = setGenerator.generatePacks(cards, count, lands);
   } else {
     boosters = Utility.makeGenericPacks(cards, count, lands);
   }
-  callback(boosters);
+
+  callback(boosters.map(pack => pack.map(Utility.mapCard)));
 }
 
 function cardGrabber(request, url, set, count, callback, cards, retryCount = 0) {

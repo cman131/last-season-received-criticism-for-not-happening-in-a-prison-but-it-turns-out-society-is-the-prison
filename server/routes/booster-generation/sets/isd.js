@@ -1,6 +1,6 @@
 const Utility = require('../utility');
 
-function generatePacks(cards, count, lands, mapCard) {
+function generatePacks(cards, count, lands) {
   const boosters = [];
 
   const transformCards = cards.filter(card => card.card_faces && card.card_faces.length > 1);
@@ -33,7 +33,7 @@ function generatePacks(cards, count, lands, mapCard) {
     booster.push(Utility.getRandomCard(transformCards, booster));
     booster.push(Utility.getRandomCard(lands, booster, false));
 
-    boosters.push(booster.map(Utility.mapCard));
+    boosters.push(booster);
   }
   return boosters;
 }

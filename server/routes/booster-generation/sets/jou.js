@@ -209,7 +209,7 @@ function generatePacks(cards, count, lands)
       // Put the land in 
       booster.push(Utility.getRandomCard(lands, booster, false));
       // Unpackages the card
-      boosters.push(booster.map(Utility.mapCard));
+      boosters.push(booster);
     }
     else
     {

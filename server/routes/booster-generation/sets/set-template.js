@@ -1,10 +1,10 @@
 const Utility = require('../utility');
 
-function generatePacks(cards, count, lands, mapCard) {
+function generatePacks(cards, count, lands) {
   const boosters = [];
   while (boosters.length < count) {
       const booster = [];
-      boosters.push(booster.map(Utility.mapCard));
+      boosters.push(booster);
   }
   return boosters;
 }
