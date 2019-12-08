@@ -1,4 +1,4 @@
-const Utility = require('./utility');
+const Utility = require('../utility');
 
 function generatePacks(cards, count, lands, mapCard) {
   const boosters = [];

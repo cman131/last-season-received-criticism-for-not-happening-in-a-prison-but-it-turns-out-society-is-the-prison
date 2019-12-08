@@ -78,7 +78,7 @@ function makePacks(cards, set, count, callback) {
     const setGenerator = require('./sets/' + set.toLowerCase());
     boosters = setGenerator.generatePacks(cards, count, lands);
   } else {
-    boosters = Utility.makeGenericBoosters(cards, count, lands);
+    boosters = Utility.makeGenericPacks(cards, count, lands);
   }
   callback(boosters);
 }

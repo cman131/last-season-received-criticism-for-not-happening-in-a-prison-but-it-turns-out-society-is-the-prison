@@ -196,11 +196,13 @@ const godPack  =
 
 const godPackRatio = 1080;
 
-function generatePacks(cards, count, lands, mapCard)
+function generatePacks(cards, count, lands)
 {
+  const boosters = [];
+  const prePacks = Utility.makeGenericPacks(cards, count, lands);
   while( boosters.length < count )
   {
-    if( getRandomIndex(godPackRatio) === 540 )
+    if(Utility.getRandomIndex(godPackRatio) === 540)
     {
       // Create a god pack
       const booster = [...godPack];
@@ -211,7 +213,7 @@ function generatePacks(cards, count, lands, mapCard)
     }
     else
     {
-      boosters.push(Utility.makeGenericPacks(cards, 1, land)[0]);
+      boosters.push(prePacks.pop());
     }
   }
   return boosters;

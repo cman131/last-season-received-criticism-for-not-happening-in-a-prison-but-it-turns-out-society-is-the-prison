@@ -36,34 +36,36 @@ function getRandomCard(cardList, currentBooster, isUnique = true) {
 }
 
 function makeGenericPacks(cards, count, lands, additionalFoilOptions = []) {
-    const foilOptions = cards.concat(additionalFoilOptions);
-    const commons = cards.filter(card => card.rarity === 'common');
-    const uncommons = cards.filter(card => card.rarity === 'uncommon');
-    let rares = cards.filter(card => card.rarity === 'rare');
-    rares = rares.concat(rares);
-    rares.concat(cards.filter(card => card.rarity === 'mythic'));
+  const boosters = [];
+  const foilOptions = cards.concat(additionalFoilOptions);
+  const commons = cards.filter(card => card.rarity === 'common');
+  const uncommons = cards.filter(card => card.rarity === 'uncommon');
+  let rares = cards.filter(card => card.rarity === 'rare');
+  rares = rares.concat(rares);
+  rares.concat(cards.filter(card => card.rarity === 'mythic'));
 
-    while(boosters.length < count) {
-      let booster = [];
-      const isFoil = getRandomIndex(6) === 2;
-      for(let i = 0; i < (isFoil ? 10 : 11); i++) {
-        booster.push(getRandomCard(commons, booster));
-      }
-      for(let i = 0; i < 3; i++) {
-        booster.push(getRandomCard(uncommons, booster));
-      }
-      booster.push(getRandomCard(rares, booster));
-
-      if (isFoil) {
-        booster.push({
-            ...getRandomCard(foilOptions, booster, false),
-            isFoil: true
-        });
-      }
-
-      booster.push(getRandomCard(lands, booster, false));
-      boosters.push(booster.map(mapCard));
+  while(boosters.length < count) {
+    let booster = [];
+    const isFoil = getRandomIndex(6) === 2;
+    for(let i = 0; i < (isFoil ? 10 : 11); i++) {
+      booster.push(getRandomCard(commons, booster));
     }
+    for(let i = 0; i < 3; i++) {
+      booster.push(getRandomCard(uncommons, booster));
+    }
+    booster.push(getRandomCard(rares, booster));
+
+    if (isFoil) {
+      booster.push({
+        ...getRandomCard(foilOptions, booster, false),
+        isFoil: true
+      });
+    }
+
+    booster.push(getRandomCard(lands, booster, false));
+    boosters.push(booster.map(mapCard));
+  }
+  return boosters;
 }
 
 exports.mapCard = mapCard;

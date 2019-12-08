@@ -1,4 +1,4 @@
-const Utility = require('./utility');
+const Utility = require('../utility');
 
 const snowLands = [
   {
@@ -55,7 +55,7 @@ const snowLands = [
 
 function generatePacks(cards, count, baseLands, mapCard) {
   const lands = snowLands.concat(baseLands);
-  return Utility.makeGenericBoosters(cards, count, lands);
+  return Utility.makeGenericPacks(cards, count, lands);
 }
 
 exports.generatePacks = generatePacks;
