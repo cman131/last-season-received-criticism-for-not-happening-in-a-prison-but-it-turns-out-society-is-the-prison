@@ -1,5 +1,6 @@
 const Utility = require('./utility');
 const specialSetList = require('./sets/special-set-list').specialSetList;
+const fs = require('fs');
 
 const lands = [
   {
@@ -55,6 +56,7 @@ const lands = [
 ];
 
 const baseBoosterUrl = 'https://api.scryfall.com/cards/search?order=set&q=set%3A{0}+unique%3Acards+is%3Abooster+-type%3Abasic&unique=cards&is=booster';
+const baseCollectionUrl = 'https://api.scryfall.com/cards/collection';
 
 function makePacks(cards, set, count, callback) {
   let boosters = [];
@@ -65,6 +67,11 @@ function makePacks(cards, set, count, callback) {
     boosters = Utility.makeGenericPacks(cards, count, lands);
   }
 
+  callback(boosters.map(pack => pack.map(Utility.mapCard)));
+}
+
+function makeCubePacks(cards, count, callback) {
+  const boosters = Utility.makeTrulyRandomPack(cards, count, lands);
   callback(boosters.map(pack => pack.map(Utility.mapCard)));
 }
 
@@ -91,15 +98,50 @@ function cardGrabber(request, url, set, count, callback, cards, retryCount = 0) 
   });
 }
 
-function generatePacks(request, setCode, count , callback) {
-  cardGrabber(
-    request,
-    baseBoosterUrl.replace('{0}', setCode),
-    setCode,
-    count,
-    callback,
-    []
-  );
+function cubeGrabber(request, count, callback, cards, remainingChunks = []) {
+  if (remainingChunks.length > 0) {
+    const currentChunk = remainingChunks.pop();
+    request.post({
+      url: baseCollectionUrl,
+      json: true,
+      headers: { 'Content-Type': 'application/json' },
+      body: {
+        identifiers: currentChunk.map(cardName => ({ name: cardName }))
+      }
+    }, (err, _, data) => {
+      if (err || data.status >= 400) {
+        console.log(err || data);
+        throw err;
+      } else {
+        const newCards = cards.concat(data.data);
+        cubeGrabber(request, count, callback, newCards, remainingChunks);
+      }
+    });
+  } else {
+    makeCubePacks(cards, count, callback);
+  }
+}
+
+function generatePacks(request, setCode, count, callback, isCube = false) {
+  if (!isCube) {
+    cardGrabber(
+      request,
+      baseBoosterUrl.replace('{0}', setCode),
+      setCode,
+      count,
+      callback,
+      []
+    );
+  } else {
+    let cube = require('./cubes/' + setCode.toLowerCase());
+    cubeGrabber(
+      request,
+      count,
+      callback,
+      [],
+      Utility.makeChunks(cube.cardNames, 70)
+    )
+  }
 }
 
 exports.generatePacks = generatePacks;
