@@ -335,7 +335,7 @@ function populatePacks(code, playerId, sets) {
     }
   }
   for (let set in setMap) {
-    BoosterGenerator.generatePacks(request, set, setMap[set], boosterFulfillment);
+    BoosterGenerator.generatePacks(request, set, setMap[set], boosterFulfillment, set.length > 3);
   }
 }
 
@@ -783,7 +783,7 @@ router.get('/game/:gameId/player/:playerId/deck/:deckId/tabletop', (req, res) =>
 
 router.get('/testpack/:setId/:count', (req, res) => {
   try {
-    if (!req.params.setId || req.params.setId.length !== 3) {
+    if (!req.params.setId || req.params.setId.length < 3) {
       res.status(400);
       res.send({ message: 'No. Bad input, bruh.', setId: req.params.setId });
     } else {
@@ -791,11 +791,10 @@ router.get('/testpack/:setId/:count', (req, res) => {
       if (req.params.count) {
         count = parseInt(req.params.count);
       }
-
       BoosterGenerator.generatePacks(request, req.params.setId, count, (packs) => {
         res.status(200);
         res.send({ data: packs.map(pack => pack.map(card => card.name)) });
-      });
+      }, !!req.query.cube);
     }
   } catch(e) {
     console.log(e);

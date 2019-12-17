@@ -27,6 +27,14 @@ function getRandomIndex(length = 0) {
   return Math.floor(Math.random() * length);
 }
 
+function makeChunks(items, chunkSize) {
+  var chunks = [];
+  for (var i = 0; i < items.length; i += chunkSize) {
+    chunks.push(items.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
 function getRandomCard(cardList, currentBooster, isUnique = true) {
   let index = getRandomIndex(cardList.length);
   while(isUnique && currentBooster.filter(card => card.name === cardList[index].name).length > 0) {
@@ -68,7 +76,24 @@ function makeGenericPacks(cards, count, lands, additionalFoilOptions = []) {
   return boosters;
 }
 
+
+function makeTrulyRandomPack(cards, count) {
+  const boosters = [];
+
+  while(boosters.length < count) {
+    const booster = [];
+    for(let i = 0; i < 15; i++) {
+      booster.push(getRandomCard(cards, booster));
+    }
+    boosters.push(booster);
+  }
+
+  return boosters;
+}
+
 exports.mapCard = mapCard;
 exports.getRandomIndex = getRandomIndex;
+exports.makeChunks = makeChunks;
 exports.getRandomCard = getRandomCard;
 exports.makeGenericPacks = makeGenericPacks;
+exports.makeTrulyRandomPack = makeTrulyRandomPack;

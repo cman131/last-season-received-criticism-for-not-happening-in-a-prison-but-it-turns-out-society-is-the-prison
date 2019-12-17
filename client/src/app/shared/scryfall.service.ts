@@ -22,6 +22,13 @@ export class ScryfallService {
     'draft_innovation'
   ];
 
+  private availableCubes: Set[] = [
+    {
+      name: 'Vintage Cube Winter 2020',
+      code: 'vintage-winter-2020'
+    }
+  ];
+
   constructor(
     private http: HttpClient
   ) { }
@@ -54,12 +61,12 @@ export class ScryfallService {
 
   public getSets(): Observable<Set[]> {
     return this.http.get('https://api.scryfall.com/sets').pipe(map((data: any) => {
-      return data.data.filter(set => this.acceptableSetTypes.indexOf(set.set_type.toLowerCase()) > -1).map(set => {
-        return {
+      return data.data.filter(set => this.acceptableSetTypes.indexOf(set.set_type.toLowerCase()) > -1).map(set =>
+        ({
           name: set.name,
           code: set.code
-        };
-      });
+        })
+      ).concat(this.availableCubes);
     }));
   }
 }
