@@ -1,0 +1,117 @@
+.proxy-page {
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  width: 100%;
+  text-align: center;
+}
+
+textarea {
+  resize: none;
+  height: 350px;
+  padding: .75rem .75rem;
+  font-size: 18px;
+  line-height: 1.5;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  overflow: auto;
+}
+
+.btn-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 15px;
+}
+
+.btn-section .btn {
+  margin-left: 15px;
+}
+
+.btn {
+  text-decoration: none;
+  color: #282b31;
+  background-color: #ffffff;
+  border-color: #cdcfd2;
+  border-top: 1px solid #cdcfd2;
+  border-bottom: 1px solid #cdcfd2;
+  border-left: 1px solid #cdcfd2;
+  border-right: 1px solid #cdcfd2;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-block;
+  white-space: nowrap;
+  padding: 6px 12px;
+  line-height: 1.42857;
+  font-size: 15px;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-touch-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+}
+
+.btn-primary {
+  color: #ffffff;
+  background-color: #007ca6;
+  border-color: #007ca6;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: .65;
+  box-shadow: none;
+}
+
+.proxy-list-page {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card-display {
+  width: 16.666667%;
+}
+
+.card-display img {
+  height: auto;
+  width: 100%;
+  vertical-align: middle;
+  border-style: none;
+}
+
+@media only print {
+  ::ng-deep html, ::ng-deep body {
+    height: auto;
+    margin: 0;
+  }
+  
+  .d-print-none {
+    display: none;
+  }
+  
+  @page {
+    size: auto;
+    margin-top: 0.25in;
+    margin-left: 0.25in;
+    margin-bottom: 0;
+    margin-right: 0;
+  }
+  
+  .card-display {
+    page-break-inside: avoid;
+    width: 2.45in;
+    display: inline-block;
+  }
+  
+  .proxy-list-page {
+    display: block !important;
+    width: 100%;
+    font-size: 0;
+  }
+}

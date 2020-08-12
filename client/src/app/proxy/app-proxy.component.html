@@ -1,0 +1,51 @@
+<div *ngIf="editing"
+  class="proxy-page d-print-none"
+>
+  <h2>Enter your card list below:</h2>
+  <textarea
+    [(ngModel)]="cardListText"
+    placeholder="Enter card names in MTGO format. You may specify the set using a pipe delimiter like in Grafdigger's cage below:
+
+4 Fire // Ice
+1 Old man of the sea
+3 Grafdigger's cage | DKA"
+  >
+    {{ cardListText }}
+  </textarea>
+</div>
+<div *ngIf="!editing"
+  class="d-print-none"
+>
+  <p>You may now print the page by pressing the key combination <b>CTRL + P</b> on your keyboard. Or printing from your browser menu.</p>
+</div>
+<div
+  class="btn-section d-print-none"
+>
+  <button *ngIf="editing"
+    class="btn btn-primary"
+    (click)="generateProxies()"
+  >
+    Generate proxies
+  </button>
+  <button *ngIf="!editing"
+    class="btn btn-primary"
+    (click)="editing = true"
+  >
+    Edit
+  </button>
+  <button *ngIf="editing"
+    class="btn"
+    (click)="cardListText = ''"
+  >
+    Clear
+  </button>
+</div>
+<div *ngIf="!editing"
+  class="proxy-list-page"
+>
+  <div *ngFor="let card of cards"
+    class="card-display"
+  >
+    <img [attr.src]="card.imageUrl" [attr.alt]="card.name" />
+  </div>
+</div>
