@@ -22,6 +22,31 @@ textarea {
   overflow: auto;
 }
 
+.errors {
+  border-radius: 3px;
+  padding: 0 10px;
+  margin-bottom: 20px;
+  border-left: solid 30px;
+  color: #212327;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #f7a08f;
+  border-color: #ef4044;
+}
+.errors div {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 100%;
+}
+.errors::before {
+  content: "⚠";
+  font-family: FontAwesome;
+  margin-left: -32px;
+  margin-right: 19px;
+  color: #fff;
+}
+
 .btn-section {
   display: flex;
   flex-direction: row;

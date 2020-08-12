@@ -49,6 +49,13 @@
     Crop images?
   </label>
 </div>
+<div *ngIf="cardsNotFound && cardsNotFound.length > 0"
+  class="errors d-print-none"
+>
+  <div>
+    Some cards could not be found: {{ getCardsNotFoundString() }}
+  </div>
+</div>
 <div *ngIf="!editing"
   class="proxy-list-page"
 >

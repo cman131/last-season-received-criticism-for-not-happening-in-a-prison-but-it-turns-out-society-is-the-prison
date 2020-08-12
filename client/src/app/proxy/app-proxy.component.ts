@@ -3,8 +3,8 @@ import { GameService } from '../shared/game.service';
 import { Card } from '../shared/types/card';
 import { ParamMap, ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
-import { LandRef } from '../shared/land-ref';
 import { ScryfallService } from '../shared/scryfall.service';
+import { CardQuery } from '../shared/types/card-query';
 
 @Component({
   selector: 'app-proxy',
@@ -13,6 +13,7 @@ import { ScryfallService } from '../shared/scryfall.service';
 })
 export class AppProxyComponent {
   public cards: Card[] = [];
+  public cardsNotFound: CardQuery[] = [];
   public code: string;
   public playerId: string;
 
@@ -92,17 +93,38 @@ export class AppProxyComponent {
     });
     this.scryfallService.queryForProxy(cards).subscribe(results => {
       const newCardList = [];
-      for (let card of results) {
-        const match = cards.find(queryCard => queryCard.name.toLowerCase() === card.name.toLowerCase());
+      const cardsNotFound = [];
+
+      for (let card of cards) {
+        let match = results.find(queryCard => queryCard.name.toLowerCase() === card.name.toLowerCase());
+        if (!match) {
+          match = results.find(queryCard => queryCard.name.toLowerCase().indexOf(card.name.toLowerCase()) >= 0);
+        }
         if (match) {
-          for (let i = 0; i < match.count; i++) {
-            newCardList.push(card);
+          for (let i = 0; i < card.count; i++) {
+            for (let cardFace of match.faces) {
+              newCardList.push({
+                ...match,
+                imageUrl: cardFace.imageUrl,
+                imageUrlCropped: cardFace.imageUrlCropped
+              });
+            }
           }
+        } else {
+          cardsNotFound.push(card);
         }
       }
+      console.log(results);
+      console.log(newCardList);
+      console.log(cardsNotFound);
 
       this.cards = newCardList;
+      this.cardsNotFound = cardsNotFound;
     });
+  }
+
+  public getCardsNotFoundString(): string {
+    return this.cardsNotFound.map(card => card.name + (card.set ? ' (' + card.set + ')' : '')).join(', ')
   }
 
   public ngOnDestroy() {
