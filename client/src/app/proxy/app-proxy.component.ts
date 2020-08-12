@@ -18,6 +18,7 @@ export class AppProxyComponent {
 
   public cardListText: string = '';
   public editing = true;
+  public useCropped = true;
 
   constructor(
     private route: ActivatedRoute,

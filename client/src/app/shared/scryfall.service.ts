@@ -85,8 +85,10 @@ export class ScryfallService {
       name: card.name,
       description: description,
       imageUrl: card.image_uris.large,
+      imageUrlCropped: card.image_uris.border_crop,
       cmc: card.cmc,
-      colors: card.colors.map(item => this.colorMap[item])
+      colors: card.colors.map(item => this.colorMap[item]),
+      set: card.set
     };
   }
 

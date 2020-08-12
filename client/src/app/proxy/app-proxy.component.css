@@ -69,6 +69,18 @@ textarea {
   box-shadow: none;
 }
 
+.crop-checkbox {
+  margin-left: 15px;
+  padding-top: 5px;
+  text-align: center;
+  display: flex;
+  cursor: pointer;
+}
+
+.crop-checkbox input {
+  margin-right: 10px;
+}
+
 .proxy-list-page {
   display: flex;
   flex-wrap: wrap;

@@ -27,18 +27,27 @@
   >
     Generate proxies
   </button>
-  <button *ngIf="!editing"
-    class="btn btn-primary"
-    (click)="editing = true"
-  >
-    Edit
-  </button>
   <button *ngIf="editing"
     class="btn"
     (click)="cardListText = ''"
   >
     Clear
   </button>
+  <button *ngIf="!editing"
+    class="btn btn-primary"
+    (click)="editing = true"
+  >
+    Edit
+  </button>
+  <label *ngIf="!editing"
+    class="crop-checkbox"
+  >
+    <input
+      type="checkbox"
+      [(ngModel)]="useCropped"
+    />
+    Crop images?
+  </label>
 </div>
 <div *ngIf="!editing"
   class="proxy-list-page"
@@ -46,6 +55,6 @@
   <div *ngFor="let card of cards"
     class="card-display"
   >
-    <img [attr.src]="card.imageUrl" [attr.alt]="card.name" />
+    <img [attr.src]="useCropped ? card.imageUrlCropped : card.imageUrl" [attr.alt]="card.name" />
   </div>
 </div>
