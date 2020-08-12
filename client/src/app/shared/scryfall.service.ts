@@ -4,21 +4,8 @@ import { map, take } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Set } from '../shared/types/set';
 import { Card } from './types/card';
-
-export interface CardQuery {
-  name: string;
-  set?: string;
-}
-
-export interface CardQueryPrintResult {
-  set: string;
-  imageUrl: string;
-}
-
-export interface CardQueryResult {
-  name: string;
-  prints: CardQueryPrintResult[]
-}
+import { CardFace } from './types/card-face';
+import { CardQuery } from './types/card-query';
 
 @Injectable()
 export class ScryfallService {
@@ -57,7 +44,7 @@ export class ScryfallService {
       }))
     }).pipe(
       map((data: any) => {
-        return data.data.map(card => this.cardMap(card));
+        return data.data.filter(Boolean).map(card => this.cardMap(card));
       })
     );
   }
@@ -76,17 +63,40 @@ export class ScryfallService {
   }
 
   private cardMap(card: any): Card {
+    let cardFaces: CardFace[] = [];
+    let cardColors: string[] = [];
     let description = card.oracle_text;
+
     if (card.card_faces) {
       description = card.card_faces.map(cardFace => cardFace.name + ' - ' + cardFace.oracle_text).join('<br/>');
+      cardFaces = card.card_faces.map(cardFace => ({
+        imageUrl: cardFace.image_uris.large,
+        imageUrlCropped: cardFace.image_uris.border_crop
+      }));
+
+      const colorArrays = card.card_faces.map(cardFace => cardFace.colors.map(item => this.colorMap[item]));
+      for (let colorSet of colorArrays) {
+        cardColors = this.unionArrays(cardColors, colorSet);
+      }
+    } else if (card.image_uris) {
+      cardFaces = [{
+        imageUrl: card.image_uris.large,
+        imageUrlCropped: card.image_uris.border_crop,
+      }];
+
+      cardColors = card.colors.map(item => this.colorMap[item]);
     }
+
     return {
       id: card.id,
       name: card.name,
       description: description,
-      imageUrl: card.image_uris.large,
+      imageUrl: cardFaces[0].imageUrl,
+      imageUrlCropped: cardFaces[0].imageUrlCropped,
+      faces: cardFaces,
       cmc: card.cmc,
-      colors: card.colors.map(item => this.colorMap[item])
+      colors: cardColors,
+      set: card.set
     };
   }
 
@@ -116,5 +126,19 @@ export class ScryfallService {
     }
 
     return Object.keys(cardDict).map(key => cardDict[key]);
+  }
+
+  private unionArrays (x: any[], y: any[]): any[] {
+    var obj = {};
+    for (var i = x.length-1; i >= 0; -- i)
+      obj[x[i]] = x[i];
+    for (var i = y.length-1; i >= 0; -- i)
+      obj[y[i]] = y[i];
+    var res = []
+    for (var k in obj) {
+      if (obj.hasOwnProperty(k))  // <-- optional
+        res.push(obj[k]);
+    }
+    return res;
   }
 }
