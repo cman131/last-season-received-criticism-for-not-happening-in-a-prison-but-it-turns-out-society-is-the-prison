@@ -23,11 +23,14 @@ import { SortPipe } from './shared/sort-pipe';
 import { CardFilterPipe } from './shared/card-filter-pipe';
 import { DeckService } from './shared/deck.service';
 import { DraftButtonComponent } from './shared/draft-button/draft-button.component';
+import { AppProxyComponent } from './proxy/app-proxy.component';
 
 const appRoutes: Routes = [
   { path: '', component: AppHomeComponent },
   { path: 'create', component: AppCreateComponent },
   { path: 'join', component: AppJoinComponent},
+  { path: 'proxy', component: AppProxyComponent },
+  { path: 'proxy/:code/:player', component: AppProxyComponent },
   { path: 'draft/:code/:player', component: AppDraftComponent },
   { path: 'export/:code/:player', component: AppExportComponent },
   { path: 'export/:code/:player/:deckId', component: AppExportComponent },
@@ -45,6 +48,7 @@ const appRoutes: Routes = [
     AppDraftComponent,
     AppExportComponent,
     AppDeckBuilderComponent,
+    AppProxyComponent,
     FilterContainerComponent,
     FilterCheckboxComponent,
     CardDisplayComponent,
