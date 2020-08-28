@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, take } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Set } from '../shared/types/set';
 import { Card } from './types/card';
 import { CardFace } from './types/card-face';
@@ -107,8 +107,12 @@ export class ScryfallService {
           name: set.name,
           code: set.code
         })
-      ).concat(this.availableCubes);
+      );
     }));
+  }
+
+  public getCubes(): Observable<Set[]> {
+    return of(this.availableCubes);
   }
 
   private reduceDuplicatePrints(cards: any[]) {

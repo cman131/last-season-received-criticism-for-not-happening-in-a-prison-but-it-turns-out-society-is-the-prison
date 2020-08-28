@@ -18,7 +18,18 @@ export class AppCreateComponent {
     maxPlayers: 8,
     sets: []
   };
+
+  public get useCube(): boolean {
+    return this._useCube;
+  }
+  public set useCube(value: boolean) {
+    this._useCube = value;
+    this.game.sets = value ? [this.cubes[0].code] : [this.sets[0].code];
+  }
+
+  private _useCube: boolean = false;
   public sets: Set[] = [];
+  public cubes: Set[] = [];
   public errorMessage: string;
 
   constructor(
@@ -29,6 +40,9 @@ export class AppCreateComponent {
     this.scryfall.getSets().pipe(take(1)).subscribe((sets: Set[]) => {
       this.sets = sets;
       this.game.sets = [sets[0].code];
+    });
+    this.scryfall.getCubes().pipe(take(1)).subscribe((sets: Set[]) => {
+      this.cubes = sets;
     });
   }
 

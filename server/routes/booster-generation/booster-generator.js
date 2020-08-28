@@ -67,12 +67,17 @@ function makePacks(cards, set, count, callback) {
     boosters = Utility.makeGenericPacks(cards, count, lands);
   }
 
-  callback(boosters.map(pack => pack.map(Utility.mapCard)));
+  callback({
+    boosters: boosters.map(pack => pack.map(Utility.mapCard))
+  });
 }
 
-function makeCubePacks(cards, count, callback) {
-  const boosters = Utility.makeTrulyRandomPack(cards, count, lands);
-  callback(boosters.map(pack => pack.map(Utility.mapCard)));
+function makeCubePacks(remainingCards, count, fullCardPool, callback) {
+  const boosterResults = Utility.makeUniquePacks(remainingCards, count, fullCardPool);
+  callback({
+    boosters: boosterResults.boosters.map(pack => pack.map(Utility.mapCard)),
+    remainingCards: boosterResults.remainingCards
+  });
 }
 
 function cardGrabber(request, url, set, count, callback, cards, retryCount = 0) {
@@ -118,11 +123,11 @@ function cubeGrabber(request, count, callback, cards, remainingChunks = []) {
       }
     });
   } else {
-    makeCubePacks(cards, count, callback);
+    makeCubePacks(cards, count, [...cards], callback);
   }
 }
 
-function generatePacks(request, setCode, count, callback, isCube = false) {
+function generatePacks(request, setCode, count, callback, isCube = false, fullCardPool = undefined, remainingCards = undefined) {
   if (!isCube) {
     cardGrabber(
       request,
@@ -132,7 +137,7 @@ function generatePacks(request, setCode, count, callback, isCube = false) {
       callback,
       []
     );
-  } else {
+  } else if (!remainingCards) {
     let cube = require('./cubes/' + setCode.toLowerCase());
     cubeGrabber(
       request,
@@ -141,6 +146,8 @@ function generatePacks(request, setCode, count, callback, isCube = false) {
       [],
       Utility.makeChunks(cube.cardNames, 70)
     )
+  } else {
+    makeCubePacks(remainingCards, count, fullCardPool, callback);
   }
 }
 

@@ -18,3 +18,11 @@
   padding-right: 30px;
   background-color: rgba(255, 62, 62, 0.603);
 }
+.set-type-selector {
+  margin-bottom: 10px;
+}
+
+.set-selector {
+  display: flex;
+  flex-direction: column;
+}
