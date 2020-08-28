@@ -6,6 +6,8 @@ import { GameConnection } from '../shared/types/game-connection';
 import { Router } from '@angular/router';
 import { ScryfallService } from '../shared/scryfall.service';
 import { take } from 'rxjs/operators';
+import { CubeService } from '../shared/cube.service';
+import { Cube } from '../shared/types/cube';
 
 @Component({
   selector: 'app-create',
@@ -18,17 +20,32 @@ export class AppCreateComponent {
     maxPlayers: 8,
     sets: []
   };
+
+  public get useCube(): boolean {
+    return this._useCube;
+  }
+  public set useCube(value: boolean) {
+    this._useCube = value;
+    this.game.sets = value ? [this.cubes[0].code] : [this.sets[0].code];
+  }
+  private _useCube: boolean = false;
+
   public sets: Set[] = [];
+  public cubes: Set[] = [];
   public errorMessage: string;
 
   constructor(
     private managementService: ManagementService,
     private router: Router,
-    private scryfall: ScryfallService
+    private scryfall: ScryfallService,
+    private cubeService: CubeService
   ) {
     this.scryfall.getSets().pipe(take(1)).subscribe((sets: Set[]) => {
       this.sets = sets;
       this.game.sets = [sets[0].code];
+    });
+    this.cubeService.getAllCubes().pipe(take(1)).subscribe((cubes: Cube[]) => {
+      this.cubes = cubes.map(cube => ({ name: cube.name, code: cube.cubeId }));
     });
   }
 

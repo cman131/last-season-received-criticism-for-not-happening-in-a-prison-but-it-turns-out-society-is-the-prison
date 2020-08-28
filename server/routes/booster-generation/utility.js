@@ -43,6 +43,14 @@ function getRandomCard(cardList, currentBooster, isUnique = true) {
   return cardList[index];
 }
 
+function popRandomCard(cardList) {
+  let index = getRandomIndex(cardList.length);
+  return {
+    card: cardList.splice(index, 1)[0],
+    remainingCards: cardList
+  }
+}
+
 function makeGenericPacks(cards, count, lands, additionalFoilOptions = []) {
   const boosters = [];
   const foilOptions = cards.concat(additionalFoilOptions);
@@ -77,18 +85,28 @@ function makeGenericPacks(cards, count, lands, additionalFoilOptions = []) {
 }
 
 
-function makeTrulyRandomPack(cards, count) {
+function makeUniquePacks(cards, count, fullCardPool) {
   const boosters = [];
+  let remainingCards = [...cards];
 
   while(boosters.length < count) {
     const booster = [];
     for(let i = 0; i < 15; i++) {
-      booster.push(getRandomCard(cards, booster));
+      if (remainingCards.length === 0) {
+        remainingCards = [...fullCardPool];
+      }
+
+      const result = popRandomCard(remainingCards);
+      booster.push(result.card);
+      remainingCards = result.remainingCards;
     }
     boosters.push(booster);
   }
 
-  return boosters;
+  return {
+    boosters: boosters,
+    remainingCards: remainingCards
+  };
 }
 
 exports.mapCard = mapCard;
@@ -96,4 +114,4 @@ exports.getRandomIndex = getRandomIndex;
 exports.makeChunks = makeChunks;
 exports.getRandomCard = getRandomCard;
 exports.makeGenericPacks = makeGenericPacks;
-exports.makeTrulyRandomPack = makeTrulyRandomPack;
+exports.makeUniquePacks = makeUniquePacks;

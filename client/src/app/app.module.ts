@@ -24,6 +24,7 @@ import { CardFilterPipe } from './shared/card-filter-pipe';
 import { DeckService } from './shared/deck.service';
 import { DraftButtonComponent } from './shared/draft-button/draft-button.component';
 import { AppProxyComponent } from './proxy/app-proxy.component';
+import { CubeService } from './shared/cube.service';
 
 const appRoutes: Routes = [
   { path: '', component: AppHomeComponent },
@@ -71,7 +72,8 @@ const appRoutes: Routes = [
     ScryfallService,
     ConfigService,
     ExportService,
-    DeckService
+    DeckService,
+    CubeService
   ],
   bootstrap: [AppComponent]
 })

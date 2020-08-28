@@ -5,6 +5,7 @@ import { ParamMap, ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { ScryfallService } from '../shared/scryfall.service';
 import { CardQuery } from '../shared/types/card-query';
+import { CubeService } from '../shared/cube.service';
 
 @Component({
   selector: 'app-proxy',
@@ -20,11 +21,13 @@ export class AppProxyComponent {
   public cardListText: string = '';
   public editing = true;
   public useCropped = true;
+  public cubeName = '';
 
   constructor(
     private route: ActivatedRoute,
     private gameService: GameService,
-    private scryfallService: ScryfallService
+    private scryfallService: ScryfallService,
+    private cubeService: CubeService
   ) {
     this.route.paramMap.pipe(take(1)).subscribe((params: ParamMap) => {
       this.code = params.get('code');
@@ -48,6 +51,22 @@ export class AppProxyComponent {
         });
       }
     });
+  }
+
+  public saveAsCube(): void {
+    if (
+      !this.editing &&
+      this.cubeName &&
+      this.cards &&
+      this.cards.length > 0
+    ) {
+      this.cubeService.save({
+        name: this.cubeName.trim(),
+        cardNames: this.cards.map(card => card.name)
+      }).subscribe(_ => {
+        alert(this.cubeName + ' Saved');
+      });
+    }
   }
 
   public getCardListText(): string {
@@ -91,6 +110,7 @@ export class AppProxyComponent {
           };
         }
     });
+
     this.scryfallService.queryForProxy(cards).subscribe(results => {
       const newCardList = [];
       const cardsNotFound = [];
@@ -114,9 +134,6 @@ export class AppProxyComponent {
           cardsNotFound.push(card);
         }
       }
-      console.log(results);
-      console.log(newCardList);
-      console.log(cardsNotFound);
 
       this.cards = newCardList;
       this.cardsNotFound = cardsNotFound;

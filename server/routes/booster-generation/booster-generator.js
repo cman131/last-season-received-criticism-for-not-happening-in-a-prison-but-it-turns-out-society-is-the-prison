@@ -1,6 +1,7 @@
 const Utility = require('./utility');
 const specialSetList = require('./sets/special-set-list').specialSetList;
 const fs = require('fs');
+const ObjectId = require('mongodb').ObjectID;
 
 const lands = [
   {
@@ -67,12 +68,17 @@ function makePacks(cards, set, count, callback) {
     boosters = Utility.makeGenericPacks(cards, count, lands);
   }
 
-  callback(boosters.map(pack => pack.map(Utility.mapCard)));
+  callback({
+    boosters: boosters.map(pack => pack.map(Utility.mapCard))
+  });
 }
 
-function makeCubePacks(cards, count, callback) {
-  const boosters = Utility.makeTrulyRandomPack(cards, count, lands);
-  callback(boosters.map(pack => pack.map(Utility.mapCard)));
+function makeCubePacks(remainingCards, count, fullCardPool, callback) {
+  const boosterResults = Utility.makeUniquePacks(remainingCards, count, fullCardPool);
+  callback({
+    boosters: boosterResults.boosters.map(pack => pack.map(Utility.mapCard)),
+    remainingCards: boosterResults.remainingCards
+  });
 }
 
 function cardGrabber(request, url, set, count, callback, cards, retryCount = 0) {
@@ -118,11 +124,11 @@ function cubeGrabber(request, count, callback, cards, remainingChunks = []) {
       }
     });
   } else {
-    makeCubePacks(cards, count, callback);
+    makeCubePacks(cards, count, [...cards], callback);
   }
 }
 
-function generatePacks(request, setCode, count, callback, isCube = false) {
+function generatePacks(MongoClient, dbUrl, request, setCode, count, callback, isCube = false, fullCardPool = undefined, remainingCards = undefined) {
   if (!isCube) {
     cardGrabber(
       request,
@@ -132,15 +138,30 @@ function generatePacks(request, setCode, count, callback, isCube = false) {
       callback,
       []
     );
+  } else if (!remainingCards) {
+    MongoClient.connect(dbUrl, { useNewUrlParser: true }, (err, database) => {
+      if (err) {
+        throw err;
+      }
+      let db = database.db('draft');
+      db.collection('cubes').find({
+        cubeId: new ObjectId(setCode)
+      }).toArray((err, results) => {
+        database.close();
+        if (err) {
+          throw err;
+        }
+        cubeGrabber(
+          request,
+          count,
+          callback,
+          [],
+          Utility.makeChunks(results[0].cardNames, 70)
+        )
+      });
+    });
   } else {
-    let cube = require('./cubes/' + setCode.toLowerCase());
-    cubeGrabber(
-      request,
-      count,
-      callback,
-      [],
-      Utility.makeChunks(cube.cardNames, 70)
-    )
+    makeCubePacks(remainingCards, count, fullCardPool, callback);
   }
 }
 

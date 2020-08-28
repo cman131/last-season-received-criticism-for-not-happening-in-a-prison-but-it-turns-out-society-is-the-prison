@@ -41,18 +41,36 @@
   <div
     class="form-content"
   >
-    <label for="set-selector">
-      Sets (up to 3): 
+    <div class="set-type-selector">
+      <label>
+        <input
+          type="radio"
+          [value]="false"
+          [(ngModel)]="useCube"
+        >
+        Set draft
+      </label>
+      <label>
+        <input
+          type="radio"
+          [value]="true"
+          [(ngModel)]="useCube"
+        >
+        Cube draft
+      </label>
+    </div>
+    <label class="set-selector" for="set-selector">
+      {{ !useCube ? 'Sets (up to 3):' : 'Cube' }}
       <select
         id="set-selector"
-        multiple
+        [attr.multiple]="!useCube"
         type="select"
         [ngClass]="{
           'invalid': !isSetsValid()
         }"
         [(ngModel)]="game.sets"
       >
-        <option *ngFor="let set of sets"
+        <option *ngFor="let set of (!useCube ? sets : cubes)"
           [value]="set.code"
         >
           {{ set.name + ' (' + set.code + ')' }}
