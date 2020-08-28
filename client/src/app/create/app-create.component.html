@@ -63,7 +63,7 @@
       {{ !useCube ? 'Sets (up to 3):' : 'Cube' }}
       <select
         id="set-selector"
-        multiple
+        [attr.multiple]="!useCube"
         type="select"
         [ngClass]="{
           'invalid': !isSetsValid()

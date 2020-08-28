@@ -17,6 +17,16 @@
   class="d-print-none"
 >
   <p>You may now print the page by pressing the key combination <b>CTRL + P</b> on your keyboard. Or printing from your browser menu.</p>
+  <div>
+    <input type="text" [(ngModel)]="cubeName" placeholder="Cube name">
+    <button
+      class="btn btn-primary"
+      [disabled]="!cubeName"
+      (click)="saveAsCube()"
+    >
+      Save as Cube
+    </button>
+  </div>
 </div>
 <div
   class="btn-section d-print-none"

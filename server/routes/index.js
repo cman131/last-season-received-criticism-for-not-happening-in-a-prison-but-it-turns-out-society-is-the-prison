@@ -333,7 +333,7 @@ function populatePacks(code, playerId, sets, fullCardPool = undefined, remaining
   };
 
   if (sets[0].length > 3) {
-    BoosterGenerator.generatePacks(request, sets[0], 3, boosterFulfillment, true, fullCardPool, remainingCards);
+    BoosterGenerator.generatePacks(MongoClient, config.dbUrl, request, sets[0], 3, boosterFulfillment, true, fullCardPool, remainingCards);
   } else {
     let setMap = {};
     for (let set of sets) {
@@ -344,7 +344,7 @@ function populatePacks(code, playerId, sets, fullCardPool = undefined, remaining
       }
     }
     for (let set in setMap) {
-      BoosterGenerator.generatePacks(request, set, setMap[set], boosterFulfillment, set.length > 3, fullCardPool, remainingCards);
+      BoosterGenerator.generatePacks(MongoClient, config.dbUrl, request, set, setMap[set], boosterFulfillment, set.length > 3, fullCardPool, remainingCards);
     }
   }
 }
@@ -589,6 +589,67 @@ function updateDeck(deckId, deckModifier, callback, errCallback) {
   }, errCallback)
 }
 
+function getCubes(callback, errCallback) {
+  MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
+    if (err) {
+      errCallback({
+        status: 500,
+        error: err
+      })
+    } else {
+      const db = database.db('draft');
+      db.collection('cubes')
+        .find({})
+        .toArray((err, results) => {
+          if (err) {
+            database.close();
+            errCallback({
+              status: 500,
+              error: err
+            });
+          } else {
+            database.close();
+            callback(results);
+          }
+      });
+    }
+  });
+}
+
+function createCube(cubeName, cardNames, res) {
+  MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
+    if (err) {
+      database.close();
+      throw err;
+    } else {
+      let cubeId = new ObjectId();
+      let db = database.db('draft');
+
+      db.collection('cubes').insertOne({
+        cubeId: cubeId,
+        dateCreated: Date.now(),
+        dateModified: Date.now(),
+        name: cubeName,
+        cardNames: cardNames
+      }, (err) => {
+        if (err) {
+          res.status(500);
+          res.send({ status: 500 });
+        } else {
+          res.status(200);
+          res.send({
+            status: 200,
+            data: {
+              cubeId: cubeId
+            }
+          });
+        }
+        database.close();
+      });
+    }
+  });
+}
+
 // Create game
 router.post('/game', (req, res) => {
   handleQueue(() => {
@@ -791,6 +852,22 @@ router.get('/game/:gameId/player/:playerId/deck/:deckId/tabletop', (req, res) =>
   });
 });
 
+// Get cubes
+router.get('/cubes', (_, res) => {
+  getCubes((cubes) => {
+    res.status(200);
+    res.send({ data: cubes });
+  }, (err) => {
+    res.status(err.status);
+    res.send(err);
+  });
+});
+
+// Create cube
+router.post('/cubes', (req, res) => {
+  createCube(req.body.name, req.body.cardNames, res);
+});
+
 router.get('/testpack/:setId/:count', (req, res) => {
   try {
     if (!req.params.setId || req.params.setId.length < 3) {
@@ -801,7 +878,7 @@ router.get('/testpack/:setId/:count', (req, res) => {
       if (req.params.count) {
         count = parseInt(req.params.count);
       }
-      BoosterGenerator.generatePacks(request, req.params.setId, count, (packs) => {
+      BoosterGenerator.generatePacks(MongoClient, config.dbUrl, request, req.params.setId, count, (packs) => {
         res.status(200);
         res.send({ data: packs.map(pack => pack.map(card => card.name)) });
       }, !!req.query.cube);

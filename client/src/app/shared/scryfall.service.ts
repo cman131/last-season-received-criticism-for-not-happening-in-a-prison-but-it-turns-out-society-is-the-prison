@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, take } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { Observable, of, ReplaySubject } from 'rxjs';
 import { Set } from '../shared/types/set';
 import { Card } from './types/card';
 import { CardFace } from './types/card-face';
@@ -36,17 +36,34 @@ export class ScryfallService {
   ) { }
 
   public queryForProxy(cardQueries: CardQuery[]): Observable<Card[]> {
-    return this.http.post('https://api.scryfall.com/cards/collection', {
-      unique: 'prints',
-      identifiers: cardQueries.map(card => ({
+    let cardQueryChunks = this.makeChunks(
+      cardQueries.map(card => ({
         name: card.name,
         set: card.set
-      }))
-    }).pipe(
-      map((data: any) => {
-        return data.data.filter(Boolean).map(card => this.cardMap(card));
       })
-    );
+    )).filter(chunk => chunk && chunk.length > 0);
+    let results: Card[] = [];
+    let resultingObservable = new ReplaySubject<Card[]>();
+    let countDown = cardQueryChunks.length;
+    while(cardQueryChunks.length > 0) {
+      const chunk = cardQueryChunks.pop();
+      this.http.post('https://api.scryfall.com/cards/collection', {
+        unique: 'prints',
+        identifiers: chunk
+      }).pipe(
+        map((data: any) => {
+          return data.data.filter(Boolean).map(card => this.cardMap(card)) as Card[];
+        })
+      ).subscribe(cards => {
+        results = results.concat(cards);
+        countDown -= 1;
+        if (countDown <= 0) {
+          resultingObservable.next(results);
+          resultingObservable.complete();
+        }
+      });
+    }
+    return resultingObservable;
   }
 
   public getCards(cardNames: string[]): Observable<Card[]> {
@@ -67,7 +84,7 @@ export class ScryfallService {
     let cardColors: string[] = [];
     let description = card.oracle_text;
 
-    if (card.card_faces) {
+    if (card.card_faces && card.card_faces.length > 0 && card.card_faces[0].image_uris) {
       description = card.card_faces.map(cardFace => cardFace.name + ' - ' + cardFace.oracle_text).join('<br/>');
       cardFaces = card.card_faces.map(cardFace => ({
         imageUrl: cardFace.image_uris.large,
@@ -144,5 +161,13 @@ export class ScryfallService {
         res.push(obj[k]);
     }
     return res;
+  }
+
+  private makeChunks(array, chunkSize = 70) {
+    let chunks = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+      chunks.push(array.slice(i,i + chunkSize));
+    }
+    return chunks;
   }
 }
