@@ -15,9 +15,10 @@
         id="name"
         type="text"
         [ngClass]="{
-          'invalid': !game.name
+          'invalid': !game.name && nameInput.touched
         }"
         [(ngModel)]="game.name"
+        #nameInput="ngModel"
       />
     </label>
   </div>
@@ -30,9 +31,10 @@
         id="code"
         type="password"
         [ngClass]="{
-          'invalid': !game.code
+          'invalid': !game.code && codeInput.touched
         }"
         [(ngModel)]="game.code"
+        #codeInput="ngModel"
       />
     </label>
   </div>
