@@ -1,3 +1,14 @@
+label {
+  font-size: 18px;
+}
+input,
+select {
+  padding: 6px 12px;
+  line-height: 1.42857;
+  font-size: 15px;
+  border-radius: 2px;
+}
+
 .form-section {
   display: flex;
   height: 100%;
@@ -11,6 +22,7 @@
   max-width: 50%;
 }
 .invalid {
+  border-color: rgb(255, 0, 98);
   box-shadow: 0 0 3px rgb(255, 0, 98);
 }
 .error-message {

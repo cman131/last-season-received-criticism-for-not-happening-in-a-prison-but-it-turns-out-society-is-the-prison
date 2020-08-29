@@ -1,30 +1,42 @@
 <div
   class="form-section"
 >
-  <div *ngIf="errorMessage"
-    class="form-content error-message"
+  <div *ngIf="message"
+    class="message"
   >
-    {{ errorMessage }}
+    <div>
+      {{ message }}
+    </div>
+  </div>
+  <div *ngIf="errorMessage"
+    class="message error-message"
+  >
+    <div>
+      {{ errorMessage }}
+    </div>
   </div>
   <div
-    class="form-content"
+    class="main-form"
   >
-    <label for="name">
+    <label
+      for="name"
+      class="form-content"
+    >
       Name: 
       <input
         id="name"
         type="text"
         [ngClass]="{
-          'invalid': !game.name
+          'invalid': !game.name && nameInput.touched
         }"
         [(ngModel)]="game.name"
+        #nameInput="ngModel"
       />
     </label>
-  </div>
-  <div
-    class="form-content"
-  >
-    <label for="player-count">
+    <label
+      class="form-content"
+      for="player-count"
+    >
       Max players (1-12): 
       <input
         id="player-count"
@@ -37,10 +49,6 @@
         [(ngModel)]="game.maxPlayers"
       />
     </label>
-  </div>
-  <div
-    class="form-content"
-  >
     <div class="set-type-selector">
       <label>
         <input
@@ -60,32 +68,87 @@
       </label>
     </div>
     <label class="set-selector" for="set-selector">
-      {{ !useCube ? 'Sets (up to 3):' : 'Cube' }}
+      {{ !useCube ? 'First set (up to 3):' : 'Cube' }}
+      <div
+        class="first-set-btn-group"
+      >
+        <select
+          id="set-selector"
+          type="select"
+          [ngClass]="{
+            'invalid': !isSetsValid()
+          }"
+          [(ngModel)]="selectedSet"
+        >
+          <option *ngFor="let set of (!useCube ? sets : cubes)"
+            [value]="set.code"
+          >
+            {{ set.name + ' (' + set.code + ')' }}
+          </option>
+        </select>
+        <button *ngIf="!useCube && !this.selectedThirdSet"
+          class="add-set-button"
+          title="Add set"
+          (click)="addSet()"
+        >
+          +
+        </button>
+      </div>
+    </label>
+    <label *ngIf="!useCube && !!this.selectedSecondSet"
+      class="set-selector"
+      for="second-set-selector"
+    >
+      Second set
       <select
-        id="set-selector"
-        [attr.multiple]="!useCube"
+        id="second-set-selector"
         type="select"
         [ngClass]="{
           'invalid': !isSetsValid()
         }"
-        [(ngModel)]="game.sets"
+        [(ngModel)]="selectedSecondSet"
       >
-        <option *ngFor="let set of (!useCube ? sets : cubes)"
+        <option *ngFor="let set of sets"
           [value]="set.code"
         >
           {{ set.name + ' (' + set.code + ')' }}
         </option>
       </select>
     </label>
-  </div>
-  <div
-    class="form-content"
-  >
-    <draft-button
-      (clicked)="submit()"
-      [disabled]="!isValid()"
+    <label *ngIf="!useCube && !!this.selectedThirdSet"
+      class="set-selector"
+      for="third-set-selector"
     >
-      Create game
-    </draft-button>
+      Third set
+      <select
+        id="third-set-selector"
+        type="select"
+        [ngClass]="{
+          'invalid': !isSetsValid()
+        }"
+        [(ngModel)]="selectedThirdSet"
+      >
+        <option *ngFor="let set of sets"
+          [value]="set.code"
+        >
+          {{ set.name + ' (' + set.code + ')' }}
+        </option>
+      </select>
+    </label>
+    <div
+      class="form-content"
+    >
+      <draft-button
+        (clicked)="submit()"
+        [disabled]="!isValid()"
+        [isPrimary]="true"
+      >
+        Create game
+      </draft-button>
+    </div>
   </div>
 </div>
+<wait
+  [isWaiting]="isWaiting"
+>
+</wait>

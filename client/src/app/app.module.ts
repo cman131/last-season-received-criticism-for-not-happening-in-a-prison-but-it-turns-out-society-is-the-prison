@@ -25,12 +25,15 @@ import { DeckService } from './shared/deck.service';
 import { DraftButtonComponent } from './shared/draft-button/draft-button.component';
 import { AppProxyComponent } from './proxy/app-proxy.component';
 import { CubeService } from './shared/cube.service';
+import { AppCubeManagementComponent } from './cube-management/app-cube-management.component';
+import { WaitComponent } from './shared/wait/wait.component';
 
 const appRoutes: Routes = [
   { path: '', component: AppHomeComponent },
   { path: 'create', component: AppCreateComponent },
   { path: 'join', component: AppJoinComponent},
   { path: 'proxy', component: AppProxyComponent },
+  { path: 'cubes', component: AppCubeManagementComponent },
   { path: 'proxy/:code/:player', component: AppProxyComponent },
   { path: 'draft/:code/:player', component: AppDraftComponent },
   { path: 'export/:code/:player', component: AppExportComponent },
@@ -50,12 +53,14 @@ const appRoutes: Routes = [
     AppExportComponent,
     AppDeckBuilderComponent,
     AppProxyComponent,
+    AppCubeManagementComponent,
     FilterContainerComponent,
     FilterCheckboxComponent,
     CardDisplayComponent,
     SortPipe,
     CardFilterPipe,
-    DraftButtonComponent
+    DraftButtonComponent,
+    WaitComponent
   ],
   imports: [
     CommonModule,
