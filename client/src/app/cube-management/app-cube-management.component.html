@@ -9,14 +9,14 @@
 <div *ngIf="editing"
   class="proxy-page d-print-none"
 >
-  <h2>Enter your card list below:</h2>
+  <h2>Enter your cube's card list below:</h2>
   <textarea
     [(ngModel)]="cardListText"
-    placeholder="Enter card names in MTGO format. You may specify the set using a pipe delimiter like in Grafdigger's cage below:
+    placeholder="Enter card names in MTGO format. Examples below:
 
 4 Fire // Ice
 1 Old man of the sea
-3 Grafdigger's cage | DKA"
+3 Grafdigger's cage"
   >
     {{ cardListText }}
   </textarea>
@@ -29,7 +29,7 @@
     [disabled]="!cardListText || !cardListText.trim()"
     (click)="generateProxies()"
   >
-    Generate proxies
+    Validate card names
   </button>
   <button *ngIf="editing"
     class="btn"
@@ -38,25 +38,28 @@
     Clear
   </button>
   <button *ngIf="!editing"
-    class="btn btn-primary"
+    class="btn btn-secondary"
     (click)="editing = true"
   >
     Edit
   </button>
-  <label *ngIf="!editing"
-    class="crop-checkbox"
-  >
-    <input
-      type="checkbox"
-      [(ngModel)]="useCropped"
-    />
-    Crop images?
-  </label>
 </div>
-<div *ngIf="!editing"
-  class="d-print-none"
+<div *ngIf="!editing && cards && cards.length > 0"
+  class="btn-section d-print-none"
 >
-  <p>You may now print the page by pressing the key combination <b>CTRL + P</b> on your keyboard. Or printing from your browser menu.</p>
+  <input
+    class="cube-name-input"
+    type="text"
+    [(ngModel)]="cubeName"
+    placeholder="Cube name"
+  >
+  <button
+    class="btn btn-primary"
+    [disabled]="!cubeName"
+    (click)="saveAsCube()"
+  >
+    Publish cube
+  </button>
 </div>
 <div *ngIf="!editing"
   class="proxy-list-page"
@@ -64,7 +67,7 @@
   <div *ngFor="let card of cards"
     class="card-display"
   >
-    <img [attr.src]="useCropped ? card.imageUrlCropped : card.imageUrl" [attr.alt]="card.name" />
+    <img [attr.src]="card.imageUrlCropped" [attr.alt]="card.name" />
   </div>
 </div>
 <wait

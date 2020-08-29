@@ -3,6 +3,7 @@ import { ManagementService } from '../shared/management.service';
 import { GameConfig } from '../shared/types/game-config';
 import { GameConnection } from '../shared/types/game-connection';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-join',
@@ -15,6 +16,7 @@ export class AppJoinComponent {
     code: ''
   };
   public errorMessage: string;
+  public isWaiting = false;
 
   constructor(
     private managementService: ManagementService,
@@ -23,12 +25,15 @@ export class AppJoinComponent {
 
   public submit(): void {
     // submit the thing and validate
-    this.managementService.joinGame(this.game).subscribe((connection: GameConnection) => {
-      if (connection.success) {
-        this.router.navigate(['/draft', connection.code, connection.playerId]);
-      } else {
-        this.errorMessage = connection.errorMessage;
-      }
+    this.isWaiting = true;
+    this.managementService.joinGame(this.game)
+      .pipe(finalize(() => this.isWaiting = false))
+      .subscribe((connection: GameConnection) => {
+        if (connection.success) {
+          this.router.navigate(['/draft', connection.code, connection.playerId]);
+        } else {
+          this.errorMessage = connection.errorMessage;
+        }
     });
   }
 }

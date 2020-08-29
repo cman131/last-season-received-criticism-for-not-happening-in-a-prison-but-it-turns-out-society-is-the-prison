@@ -1,3 +1,14 @@
+label {
+  font-size: 18px;
+}
+input,
+select {
+  padding: 6px 12px;
+  line-height: 1.42857;
+  font-size: 15px;
+  border-radius: 2px;
+}
+
 .form-section {
   display: flex;
   height: 100%;
@@ -6,11 +17,22 @@
   justify-content: center;
   flex-direction: column;
 }
-.form-section .form-content {
-  margin: 10px;
-  max-width: 50%;
+.form-section .main-form {
+  height: 100%;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: left;
+}
+.form-content {
+  width: 100%;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
 }
 .invalid {
+  border-color: rgba(255, 0, 98);
   box-shadow: 0 0 3px rgb(255, 0, 98);
 }
 .error-message {
@@ -18,11 +40,83 @@
   padding-right: 30px;
   background-color: rgba(255, 62, 62, 0.603);
 }
+.message {
+  width: 95%;
+  border-radius: 3px;
+  padding: 0 10px;
+  margin-bottom: 20px;
+  border-left: solid 30px;
+  color: #212327;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: #a7f78f;
+  border-color: #63ef40;
+}
+.message div {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 100%;
+}
+.message::before {
+  content: "✓";
+  font-family: FontAwesome;
+  margin-left: -32px;
+  margin-right: 19px;
+  color: #fff;
+}
+.error-message {
+  background-color: #f7a08f;
+  border-color: #ef4044;
+}
+.error-message::before {
+  content: "⚠";
+}
+
 .set-type-selector {
-  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.set-type-selector label,
+.set-type-selector input {
+  cursor: pointer;
 }
 
 .set-selector {
   display: flex;
   flex-direction: column;
+  margin-top: 10px;
+}
+
+.first-set-btn-group {
+  display: flex;
+}
+
+#set-selector {
+  flex-grow: 1;
+}
+
+.add-set-button {
+  margin-left: 10px;
+  display: inline-block;
+  text-decoration: none;
+  border-top: 1px solid #cdcfd2;
+  border-bottom: 1px solid #cdcfd2;
+  border-left: 1px solid #cdcfd2;
+  border-right: 1px solid #cdcfd2;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-block;
+  white-space: nowrap;
+  padding: 6px 12px;
+  line-height: 1.42857;
+  font-size: 15px;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-touch-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  color: #ffffff;
+  background-color: #00a632;
+  border-color: #00a632;
 }

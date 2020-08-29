@@ -1,65 +1,49 @@
 import { Component } from '@angular/core';
-import { GameService } from '../shared/game.service';
 import { Card } from '../shared/types/card';
-import { ParamMap, ActivatedRoute } from '@angular/router';
-import { take, finalize } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 import { ScryfallService } from '../shared/scryfall.service';
 import { CardQuery } from '../shared/types/card-query';
+import { CubeService } from '../shared/cube.service';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-proxy',
-  templateUrl: './app-proxy.component.html',
-  styleUrls: ['./app-proxy.component.css']
+  selector: 'app-cube-management',
+  templateUrl: './app-cube-management.component.html',
+  styleUrls: ['./app-cube-management.component.css']
 })
-export class AppProxyComponent {
+export class AppCubeManagementComponent {
   public cards: Card[] = [];
   public cardsNotFound: CardQuery[] = [];
-  public code: string;
-  public playerId: string;
 
   public cardListText: string = '';
   public editing = true;
-  public useCropped = true;
+  public cubeName = '';
   public isWaiting = false;
 
   constructor(
-    private route: ActivatedRoute,
-    private gameService: GameService,
-    private scryfallService: ScryfallService
-  ) {
-    this.route.paramMap.pipe(take(1)).subscribe((params: ParamMap) => {
-      this.code = params.get('code');
-      this.playerId = params.get('player');
-      if (this.code && this.playerId) {
-        this.gameService.setConfigListener(this.code, this.playerId);
-        this.gameService.gameConfig.subscribe(config => {
-          if (config.cards && config.cards.length > 0) {
-            const cardDict = {};
-            for (const card of config.cards) {
-              if (!(card.name in cardDict)) {
-                cardDict[card.name] = card;
-                cardDict[card.name].count = 0;
-              }
-              cardDict[card.name].count += 1;
-            }
-            this.cards = Object.values(cardDict);
-            this.cardListText = this.getCardListText();
-            this.gameService.stopListener();
+    private router: Router,
+    private scryfallService: ScryfallService,
+    private cubeService: CubeService
+  ) {}
+
+  public saveAsCube(): void {
+    if (
+      !this.editing &&
+      this.cubeName &&
+      this.cards &&
+      this.cards.length > 0
+    ) {
+      this.cubeService.save({
+        name: this.cubeName.trim(),
+        cardNames: this.cards.map(card => card.name)
+      }).subscribe(_ => {
+        this.router.navigate(['/create'], {
+          queryParams: {
+            'message': this.cubeName + ' has been published. Care to try it out?'
           }
         });
-      }
-    });
-  }
-
-  public getCardListText(): string {
-    let text = '';
-    if (this.cards) {
-      for (const card of this.cards) {
-        // tslint:disable-next-line:quotemark
-        text += card.count + ' ' + card.name + "\n";
-      }
+      });
     }
-    return text;
   }
 
   public generateProxies(): void {
@@ -128,9 +112,5 @@ export class AppProxyComponent {
 
   public getCardsNotFoundString(): string {
     return this.cardsNotFound.map(card => card.name + (card.set ? ' (' + card.set + ')' : '')).join(', ')
-  }
-
-  public ngOnDestroy() {
-    this.gameService.stopListener();
   }
 }

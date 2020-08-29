@@ -3,9 +3,9 @@ import { ManagementService } from '../shared/management.service';
 import { GameConfig } from '../shared/types/game-config';
 import { Set } from '../shared/types/set';
 import { GameConnection } from '../shared/types/game-connection';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ScryfallService } from '../shared/scryfall.service';
-import { take } from 'rxjs/operators';
+import { take, finalize } from 'rxjs/operators';
 import { CubeService } from '../shared/cube.service';
 import { Cube } from '../shared/types/cube';
 
@@ -21,6 +21,33 @@ export class AppCreateComponent {
     sets: []
   };
 
+  public get selectedSet() {
+    return this.game.sets[0];
+  }
+  public set selectedSet(value: string) {
+    this.game.sets = [value, this.selectedSecondSet, this.selectedThirdSet].filter(Boolean);
+  }
+
+  public get selectedSecondSet() {
+    if (this.game.sets.length > 1) {
+      return this.game.sets[1];
+    }
+    return undefined;
+  }
+  public set selectedSecondSet(value: string) {
+    this.game.sets = [this.selectedSet, value, this.selectedThirdSet].filter(Boolean);
+  }
+
+  public get selectedThirdSet() {
+    if (this.game.sets.length > 2) {
+      return this.game.sets[2];
+    }
+    return undefined;
+  }
+  public set selectedThirdSet(value: string) {
+    this.game.sets = [this.selectedSet, this.selectedSecondSet, value].filter(Boolean);
+  }
+
   public get useCube(): boolean {
     return this._useCube;
   }
@@ -32,21 +59,44 @@ export class AppCreateComponent {
 
   public sets: Set[] = [];
   public cubes: Set[] = [];
+  public message: string;
   public errorMessage: string;
+  public isWaiting = false;
 
   constructor(
     private managementService: ManagementService,
     private router: Router,
+    private route: ActivatedRoute,
     private scryfall: ScryfallService,
     private cubeService: CubeService
   ) {
-    this.scryfall.getSets().pipe(take(1)).subscribe((sets: Set[]) => {
-      this.sets = sets;
-      this.game.sets = [sets[0].code];
+    this.route.queryParamMap.pipe(take(1)).subscribe(paramMap => {
+      if (paramMap.has('message')) {
+        this.message = paramMap.get('message');
+      }
+    });
+    this.isWaiting = true;
+    this.scryfall.getSets()
+      .pipe(
+        take(1),
+        finalize(() => this.isWaiting = false)
+      ).subscribe((sets: Set[]) => {
+        this.sets = sets;
+        this.game.sets = [sets[0].code];
     });
     this.cubeService.getAllCubes().pipe(take(1)).subscribe((cubes: Cube[]) => {
       this.cubes = cubes.map(cube => ({ name: cube.name, code: cube.cubeId }));
     });
+  }
+
+  public addSet(): void {
+    if (!this.useCube && this.game.sets.length < 3) {
+      if (!this.selectedSecondSet) {
+        this.selectedSecondSet = this.selectedSet;
+      } else {
+        this.selectedThirdSet = this.selectedSet;
+      }
+    }
   }
 
   public isMaxPlayersValid() {
@@ -68,12 +118,15 @@ export class AppCreateComponent {
 
   public submit(): void {
     // submit the thing and validate
-    this.managementService.createGame(this.game).subscribe((connection: GameConnection) => {
-      if (connection.success) {
-        this.router.navigate(['/draft', connection.code, connection.playerId]);
-      } else {
-        this.errorMessage = connection.errorMessage;
-      }
+    this.isWaiting = true;
+    this.managementService.createGame(this.game)
+      .pipe(finalize(() => this.isWaiting = false))
+      .subscribe((connection: GameConnection) => {
+        if (connection.success) {
+          this.router.navigate(['/draft', connection.code, connection.playerId]);
+        } else {
+          this.errorMessage = connection.errorMessage;
+        }
     });
   }
 }
