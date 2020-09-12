@@ -62,6 +62,7 @@ const baseCollectionUrl = 'https://api.scryfall.com/cards/collection';
 function makePacks(cards, set, count, callback) {
   let boosters = [];
   if (specialSetList.includes(set.toLowerCase())) {
+    console.log('Special set!');
     const setGenerator = require('./sets/' + set.toLowerCase());
     boosters = setGenerator.generatePacks(cards, count, lands);
   } else {

@@ -17,13 +17,16 @@ import { LandRef } from '../shared/land-ref';
 export class AppExportComponent implements OnDestroy {
   public cards: Card[] = [];
   public deck: Deck;
+  public sideboardCards: Card[];
   public code: string;
   public playerId: string;
   public deckId: string;
+  public isForUntapIn = true;
 
   public deckActive = false;
   public copiedState = false;
   public deckCopiedState = false;
+  public sideboardCopiedState = false;
 
   public tabletopGetState: string;
   public deckTabletopGetState: string;
@@ -33,10 +36,7 @@ export class AppExportComponent implements OnDestroy {
   public get cardListText(): string {
     let text = '';
     if (this.cards) {
-      for (const card of this.cards.concat(this.lands)) {
-        // tslint:disable-next-line:quotemark
-        text += card.count + ' ' + card.name + "\n";
-      }
+      text = this.getCardListText(this.cards.concat(this.lands));
     }
     return text;
   }
@@ -44,10 +44,18 @@ export class AppExportComponent implements OnDestroy {
   public get deckListText(): string {
     let text = '';
     if (this.deck.mainBoard) {
-      for (const card of this.deck.mainBoard) {
-        // tslint:disable-next-line:quotemark
-        text += card.count + ' ' + card.name + "\n";
+      text = this.getCardListText(this.deck.mainBoard);
+    }
+    return text;
+  }
+
+  public get deckListSideboardText(): string {
+    let text = '';
+    if (this.deck.mainBoard && this.cards) {
+      if (!this.sideboardCards) {
+        this.populateSideboard();
       }
+      text = this.getCardListText(this.sideboardCards);
     }
     return text;
   }
@@ -96,14 +104,14 @@ export class AppExportComponent implements OnDestroy {
     this.stopDeckListener();
   }
 
-  public copyText(text, isDeck = false) {
+  public copyText(text, isDeck = false, isSideboard = false) {
     const el = document.createElement('textarea');
     el.value = text;
     document.body.appendChild(el);
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
-    this.notifyCopied(isDeck);
+    this.notifyCopied(isDeck, isSideboard);
   }
 
   public getTabletopData(): void {
@@ -176,16 +184,44 @@ export class AppExportComponent implements OnDestroy {
     });
   }
 
-  private notifyCopied(isDeck = false) {
+  private getCardListText(cards: Card[]) {
+    let text = '';
+    for (const card of cards) {
+      if (this.isForUntapIn) {
+        const face1Name = card.name.split('//')[0].trim();
+        text += card.count + ' ' + face1Name + "\n";
+      } else {
+        text += card.count + ' ' + card.name + "\n";
+      }
+    }
+    return text
+  }
+
+  private populateSideboard() {
+    this.sideboardCards = [...this.deck.sideBoard].filter(card =>
+      !this.lands.find(landCard => landCard.name.toLowerCase() === card.name.toLowerCase()) && card.count > 0
+    );
+
+    for (let card of this.lands) {
+      this.sideboardCards.push({ ...card, count: 20 });
+    }
+  }
+
+  private notifyCopied(isDeck = false, isSideboard = false) {
     if (!isDeck) {
       this.copiedState = true;
       setTimeout(() => {
         this.copiedState = false;
       }, 2000);
-    } else {
+    } else if (!isSideboard) {
       this.deckCopiedState = true;
       setTimeout(() => {
         this.deckCopiedState = false;
+      }, 2000);
+    } else {
+      this.sideboardCopiedState = true;
+      setTimeout(() => {
+        this.sideboardCopiedState = false;
       }, 2000);
     }
   }

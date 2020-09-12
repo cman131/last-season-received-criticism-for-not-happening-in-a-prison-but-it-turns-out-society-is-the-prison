@@ -12,7 +12,8 @@ const specialSetList = [
   'isd',
   'dka',
   'soi',
-  'emn'
+  'emn',
+  'znr'
 ]
 
 exports.specialSetList = specialSetList;
