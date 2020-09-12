@@ -17,7 +17,7 @@
     }"
     (click)="deckActive = false"
   >
-    Draft pool
+    Full draft pool
   </a>
 </div>
 <div *ngIf="deckActive && deck"
@@ -26,20 +26,51 @@
   <div
     class="text-export"
   >
-    <h2>Text format:</h2>
-    <pre class="text-output">{{ deckListText }}</pre>
-    <button *ngIf="!deckCopiedState"
-      class="btn copy-btn"
-      (click)="copyText(deckListText, true)"
+    <label
+      class="text-format-checkbox"
     >
-      Copy to clipboard
-    </button>
-    <button *ngIf="deckCopiedState"
-      class="btn copy-btn"
-      disabled="true"
+      <input
+        type="checkbox"
+        [(ngModel)]="isForUntapIn"
+      >
+      Use Untap.in format?
+    </label>
+    <div
+      class="text-export-mainboard"
     >
-      Copied.
-    </button>
+      <h2>Text format(Deck):</h2>
+      <pre class="text-output">{{ deckListText }}</pre>
+      <button *ngIf="!deckCopiedState"
+        class="btn copy-btn"
+        (click)="copyText(deckListText, true)"
+      >
+        Copy to clipboard
+      </button>
+      <button *ngIf="deckCopiedState"
+        class="btn copy-btn"
+        disabled="true"
+      >
+        Copied.
+      </button>
+    </div>
+    <div
+      class="text-export-sideboard"
+    >
+      <h2>Text format(Sideboard):</h2>
+      <pre class="text-output">{{ deckListSideboardText }}</pre>
+      <button *ngIf="!sideboardCopiedState"
+        class="btn copy-btn"
+        (click)="copyText(deckListSideboardText, true, true)"
+      >
+        Copy to clipboard
+      </button>
+      <button *ngIf="sideboardCopiedState"
+        class="btn copy-btn"
+        disabled="true"
+      >
+        Copied.
+      </button>
+    </div>
   </div>
   <div
     class="vertical-dividing-line"
@@ -79,20 +110,33 @@
   <div
     class="text-export"
   >
-    <h2>Text format:</h2>
-    <pre class="text-output">{{ cardListText }}</pre>
-    <button *ngIf="!copiedState"
-      class="btn copy-btn"
-      (click)="copyText(cardListText)"
+    <label
+      class="text-format-checkbox"
     >
-      Copy to clipboard
-    </button>
-    <button *ngIf="copiedState"
-      class="btn copy-btn"
-      disabled="true"
+      <input
+        type="checkbox"
+        [(ngModel)]="isForUntapIn"
+      >
+      Use Untap.in format?
+    </label>
+    <div
+      class="text-export-pool"
     >
-      Copied.
-    </button>
+      <h2>Text format:</h2>
+      <pre class="text-output">{{ cardListText }}</pre>
+      <button *ngIf="!copiedState"
+        class="btn copy-btn"
+        (click)="copyText(cardListText)"
+      >
+        Copy to clipboard
+      </button>
+      <button *ngIf="copiedState"
+        class="btn copy-btn"
+        disabled="true"
+      >
+        Copied.
+      </button>
+    </div>
   </div>
   <div
     class="vertical-dividing-line"

@@ -15,6 +15,20 @@
   margin-top: 20px;
 }
 
+.text-export-mainboard,
+.text-export-sideboard,
+.text-export-pool,
+.text-export {
+  display: flex;
+  flex-direction: column;
+}
+
+.text-format-checkbox {
+  padding: 15px;
+  padding-bottom: 0;
+  cursor: pointer;
+}
+
 .deckbuilder-link,
 .proxy-link {
   display: block;
