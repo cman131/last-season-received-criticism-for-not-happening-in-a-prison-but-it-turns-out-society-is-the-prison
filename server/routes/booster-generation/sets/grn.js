@@ -30,7 +30,7 @@ function generatePacks(cards, count, _) {
     booster.push(Utility.getRandomCard(rares, booster));
     if (isFoil) {
       booster.push({
-        ...Utility.getRandomCard(cards, booster, false),
+        ...Utility.getRarityWeightedRandomCard(cards, booster, false),
         isFoil: true
       });
     }

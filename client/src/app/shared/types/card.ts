@@ -12,4 +12,5 @@ export interface Card {
   colors?: string[];
   count?: number;
   unlimited?: boolean;
+  isFoil?: boolean;
 }

@@ -140,6 +140,7 @@
       <card-display *ngFor="let card of (activeDeck.sideBoard | cardFilter:filters | sort:'cmc')"
         [card]="card"
         [empty]="card.count === 0"
+        [selectable]="card.count > 0"
         (clicked)="addCard(card)"
         (selected)="updateSelected(card)"
       >
