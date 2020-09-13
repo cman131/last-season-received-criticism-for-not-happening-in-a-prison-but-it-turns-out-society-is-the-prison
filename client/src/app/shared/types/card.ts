@@ -5,6 +5,7 @@ export interface Card {
   name: string;
   imageUrl: string;
   imageUrlCropped?: string;
+  backImageUrl?: string;
   faces?: CardFace[];
   description: string;
   set?: string;

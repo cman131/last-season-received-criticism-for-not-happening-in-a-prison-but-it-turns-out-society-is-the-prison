@@ -22,6 +22,7 @@ export class AppDraftComponent implements OnInit, OnDestroy {
   public showPlayers = false;
   public browseCards = false;
 
+  public selectedCardFlipped = false;
   public selectedCard: Card = {
     id: '',
     name: '',
@@ -90,7 +91,19 @@ export class AppDraftComponent implements OnInit, OnDestroy {
     this.gameService.submitCardChoice(card);
   }
 
+  public flipSelectedCard() {
+    this.selectedCardFlipped = !this.selectedCardFlipped;
+  }
+
+  public getSelectedCardUrl(card, flipped = false) {
+    if (flipped && card.backImageUrl) {
+      return card.backImageUrl;
+    }
+    return card.imageUrl || this.backupImg;
+  }
+
   public updateSelected(card: Card) {
+    this.selectedCardFlipped = false;
     this.selectedCard = card;
   }
 

@@ -4,9 +4,16 @@
   <div
     class="filter-pane"
   >
+    <button *ngIf="selectedCard.backImageUrl"
+      class="flip-preview-control"
+      title="Flip card"
+      (click)="flipSelectedCard()"
+    >
+      <i class="fas fa-sync"></i>
+    </button>
     <img
       class="preview-pane-image"
-      [attr.src]="selectedCard.imageUrl || backupImg"
+      [attr.src]="getSelectedCardUrl(selectedCard, selectedCardFlipped)"
     />
     <div
       class="preview-pane-description"
