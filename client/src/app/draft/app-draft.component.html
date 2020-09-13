@@ -188,11 +188,11 @@
     >
       Cards: {{ gameConfig.cards.length }}
     </p>
-    <img *ngFor="let card of gameConfig.cards"
-      class="card"
-      [src]="card.imageUrl"
-      [title]="card.name"
-      (mouseenter)="updateSelected(card)"
-    />
+    <card-display *ngFor="let card of gameConfig.cards"
+      [card]="card"
+      [selectable]="false"
+      (selected)="updateSelected(card)"
+    >
+    </card-display>
   </div>
 </div>

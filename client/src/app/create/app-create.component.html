@@ -37,12 +37,12 @@
       class="form-content"
       for="player-count"
     >
-      Max players (1-12): 
+      Max players (2-12): 
       <input
         id="player-count"
         type="number"
         max="12"
-        min="1"
+        min="2"
         [ngClass]="{
           'invalid': !isMaxPlayersValid()
         }"

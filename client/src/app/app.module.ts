@@ -18,7 +18,7 @@ import { ConfigService } from './shared/config.service';
 import { ExportService } from './shared/export.service';
 import { AppDeckBuilderComponent } from './deck-builder/app-deck-builder.component';
 import { FilterContainerComponent, FilterCheckboxComponent } from './shared/filters';
-import { CardDisplayComponent } from './deck-builder/card-display/card-display.component';
+import { CardDisplayComponent } from './shared/card-display/card-display.component';
 import { SortPipe } from './shared/sort-pipe';
 import { CardFilterPipe } from './shared/card-filter-pipe';
 import { DeckService } from './shared/deck.service';

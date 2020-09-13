@@ -19,7 +19,8 @@ function mapCard(card) {
     description: description,
     imageUrl: card.image_uris ? card.image_uris.large : card.card_faces[0].image_uris.large,
     cmc: card.cmc,
-    colors: (card.colors ? card.colors : card.card_faces[0].colors).map(item => colorMap[item])
+    colors: (card.colors ? card.colors : card.card_faces[0].colors).map(item => colorMap[item]),
+    isFoil: card.isFoil
   };
 }
 
@@ -35,12 +36,36 @@ function makeChunks(items, chunkSize) {
   return chunks;
 }
 
-function getRandomCard(cardList, currentBooster, isUnique = true) {
+function getRandomCard(cardList, currentBooster = [], isUnique = true) {
   let index = getRandomIndex(cardList.length);
-  while(isUnique && currentBooster.filter(card => card.name === cardList[index].name).length > 0) {
+  while(isUnique && cardList.length > 1 && currentBooster.filter(card => card.name === cardList[index].name).length > 0) {
     index = getRandomIndex(cardList.length);
   }
   return cardList[index];
+}
+
+function getRarityWeightedRandomCard(cards, currentBooster = [], isUnique = true) {
+  const commonCards = cards.filter(card => card.rarity === 'common');
+  const alCommon = cards.filter(card => card.rarity !== 'uncommon' && card.rarity !== 'rare' && card.rarity !== 'mythic');
+  const uncommonCards = cards.filter(card => card.rarity === 'uncommon');
+  const rareCards = cards.filter(card => card.rarity === 'rare');
+  const mythicRareCards = cards.filter(card => card.rarity === 'mythic')
+
+  const rarity = getRandomIndex(100);
+  const isUncommon = rarity > 72 || commonCards.length === 0;
+  const isRare = rarity > 92 || (commonCards.length === 0 && uncommonCards.length === 0);
+  const isMythicRare = isRare && getRandomIndex(3) === 2;
+
+  if (isMythicRare && mythicRareCards.length > 0) {
+    return getRandomCard(mythicRareCards, currentBooster, isUnique);
+  } else if (isRare && rareCards.length > 0) {
+    return getRandomCard(rareCards, currentBooster, isUnique);
+  } else if (isUncommon && uncommonCards.length > 0) {
+    return getRandomCard(uncommonCards, currentBooster, isUnique);
+  } else if (commonCards.length > 0) {
+    return getRandomCard(commonCards, currentBooster, isUnique)
+  }
+  return getRandomCard(cards, currentBooster, isUnique);
 }
 
 function popRandomCard(cardList) {
@@ -58,7 +83,7 @@ function makeGenericPacks(cards, count, lands, additionalFoilOptions = []) {
   const uncommons = cards.filter(card => card.rarity === 'uncommon');
   let rares = cards.filter(card => card.rarity === 'rare');
   rares = rares.concat(rares);
-  rares.concat(cards.filter(card => card.rarity === 'mythic'));
+  rares = rares.concat(cards.filter(card => card.rarity === 'mythic'));
 
   while(boosters.length < count) {
     let booster = [];
@@ -73,7 +98,7 @@ function makeGenericPacks(cards, count, lands, additionalFoilOptions = []) {
 
     if (isFoil) {
       booster.push({
-        ...getRandomCard(foilOptions, booster, false),
+        ...getRarityWeightedRandomCard(foilOptions, booster, false),
         isFoil: true
       });
     }
@@ -113,5 +138,6 @@ exports.mapCard = mapCard;
 exports.getRandomIndex = getRandomIndex;
 exports.makeChunks = makeChunks;
 exports.getRandomCard = getRandomCard;
+exports.getRarityWeightedRandomCard = getRarityWeightedRandomCard;
 exports.makeGenericPacks = makeGenericPacks;
 exports.makeUniquePacks = makeUniquePacks;

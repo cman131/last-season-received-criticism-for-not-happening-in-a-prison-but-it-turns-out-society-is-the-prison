@@ -14,6 +14,9 @@ export class CardDisplayComponent {
   @Input()
   public empty = false;
 
+  @Input()
+  public selectable = true;
+
   @Output()
   public selected = new EventEmitter();
 
