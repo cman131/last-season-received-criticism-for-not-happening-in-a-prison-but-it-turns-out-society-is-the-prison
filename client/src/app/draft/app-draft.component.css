@@ -20,6 +20,35 @@ ul {
   display: inline-block;
   width: 300px;
   padding: 5px;
+  position: relative;
+}
+
+.flip-preview-control {
+  position: absolute;
+  top: 110px;
+  right: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  text-decoration: none;
+  color: #282b31;
+  background-color: #ffffff;
+  border-color: #cdcfd2;
+  border-top: 1px solid #cdcfd2;
+  border-bottom: 1px solid #cdcfd2;
+  border-left: 1px solid #cdcfd2;
+  border-right: 1px solid #cdcfd2;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-block;
+  white-space: nowrap;
+  padding: 6px 12px;
+  line-height: 1.42857;
+  font-size: 15px;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-touch-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
 }
 
 .preview-pane-image {

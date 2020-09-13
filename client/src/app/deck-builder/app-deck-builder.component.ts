@@ -44,6 +44,7 @@ export class AppDeckBuilderComponent implements OnDestroy {
     description: '',
     imageUrl: ''
   };
+  public selectedCardFlipped = false;
 
   public backupImg = 'https://i.imgur.com/LdOBU1I.jpg';
   public landNames = LandRef.landNames;
@@ -166,7 +167,19 @@ export class AppDeckBuilderComponent implements OnDestroy {
     }
   }
 
+  public flipSelectedCard() {
+    this.selectedCardFlipped = !this.selectedCardFlipped;
+  }
+
+  public getSelectedCardUrl(card, flipped = false) {
+    if (flipped && card.backImageUrl) {
+      return card.backImageUrl;
+    }
+    return card.imageUrl || this.backupImg;
+  }
+
   public updateSelected(card: Card) {
+    this.selectedCardFlipped = false;
     this.selectedCard = card;
   }
 

@@ -18,6 +18,7 @@ function mapCard(card) {
     name: card.name,
     description: description,
     imageUrl: card.image_uris ? card.image_uris.large : card.card_faces[0].image_uris.large,
+    backImageUrl: card.card_faces && card.card_faces.length > 1 ? card.card_faces[1].image_uris.large : undefined,
     cmc: card.cmc,
     colors: (card.colors ? card.colors : card.card_faces[0].colors).map(item => colorMap[item]),
     isFoil: card.isFoil
