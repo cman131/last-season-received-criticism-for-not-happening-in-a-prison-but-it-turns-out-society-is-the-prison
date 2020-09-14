@@ -671,6 +671,43 @@ router.put('/game/:gameId', (req, res) => {
   }, res);
 });
 
+// end game
+router.post('/game/:gameId/player/:playerId/endgame', (req, res) => {
+  const code = req.params.gameId;
+  const playerId = req.params.playerId;
+
+  MongoClient.connect(config.dbUrl, { useNewUrlParser: true }, (err, database) => {
+    if (err) {
+      throw err;
+    } else {
+      let db = database.db('draft');
+      db.collection('games').find({ code: new ObjectId(code) }).toArray((err, findResults) => {
+        if (err) {
+          send(res);
+          database.close();
+        } else if (findResults.length > 0) {
+          let findResult = findResults[0];
+          let player = findResult.players.filter(plyr => plyr.id.toString() === playerId.toString())[0];
+          player.done = true;
+          player.currentPack = [];
+          player.packQueue = [];
+          db.collection('games').update({ code: new ObjectId(code) }, findResult, (err) => {
+            if (err) {
+              send(res);
+            } else {
+              send(res, 200);
+            }
+            database.close();
+          });
+        } else {
+          send(res, 404, undefined, 'Game not found');
+          database.close();
+        }
+      });
+    };
+  });
+});
+
 // Choose card
 router.post('/game/:gameId/player/:playerId', (req, res) => {
   handleQueue(() => {
