@@ -64,6 +64,12 @@ export class GameService implements OnDestroy {
     });
   }
 
+  public endGame(code: string, playerId: string) {
+    this.http.post(this.baseUrl + '/game/' + code + '/player/' + playerId + '/endgame', {}).pipe(take(1)).subscribe(() => {
+      console.log('deleted');
+    });
+  }
+
   public startGame() {
     if (this._gameConfig.state === 0) {
       this.stopListener();
